@@ -1,0 +1,41 @@
+{
+  "name": "ffan/dop-uis",
+  "description": "Dop ui service framework",
+  "keywords": [
+    "ffan",
+    "dop",
+    "uis"],
+  "type": "composer",
+  "license": "BSD-3-Clause",
+  "minimum-stability": "dev",
+  "require": {
+    "php": ">=5.6.0",
+    "ffan/std-event": "2.*",
+    "ffan/std-common": "2.*",
+    "ffan/std-logger": "1.*",
+    "ffan/std-console": "1.*",
+    "ffan/php-dop": "1.*",
+    "ffan/std-async": "1.*"
+  },
+  "autoload": {
+    "psr-4": {
+      "FFan\\Dop\\Uis\\": "src"
+    }
+  },
+  "config": {
+    "secure-http": false
+  },
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "http://composer.intra.ffan.com/repo/private/"
+    },
+    {
+      "type": "composer",
+      "url": "http://composer.intra.ffan.com/repo/packagist/"
+    },
+    {
+      "packagist": false
+    }
+  ]
+}
