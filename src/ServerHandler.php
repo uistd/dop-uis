@@ -1,11 +1,11 @@
 <?php
-namespace FFan\Uis\Base;
+namespace FFan\Dop\Uis;
 
 use FFan\Std\Common\Str as FFanStr;
 
 /**
  * Class ServerHandler
- * @package FFan\Uis\Base
+ * @package FFan\Dop\Uis
  */
 class ServerHandler
 {

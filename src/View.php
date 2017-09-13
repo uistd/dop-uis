@@ -1,13 +1,13 @@
 <?php
 
-namespace FFan\Uis\Base;
+namespace FFan\Dop\Uis;
 
 use FFan\Std\Common\Env as FFanEnv;
 use FFan\Std\Console\Debug;
 
 /**
  * Class View 显示类
- * @package FFan\Uis\Base
+ * @package FFan\Dop\Uis
  */
 class View
 {

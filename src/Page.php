@@ -1,10 +1,11 @@
 <?php
 
-namespace FFan\Uis\Base;
+namespace FFan\Dop\Uis;
+use FFan\Std\Http\ApiResult;
 
 /**
  * Class Page
- * @package FFan\Uis\Base
+ * @package FFan\Dop\Uis
  */
 class Page
 {
@@ -31,23 +32,6 @@ class Page
     {
         $this->response = $app->getResponse();
         $this->app = $app;
-    }
-
-    /**
-     * 获取$_GET request对象
-     * @return Request
-     */
-    public function queryRequest()
-    {
-        return $this->app->getQueryRequest();
-    }
-
-    /**
-     * 获取$_POST 对象
-     */
-    public function postRequest()
-    {
-        return $this->app->getPostRequest();
     }
 
     /**

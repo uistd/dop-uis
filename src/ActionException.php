@@ -1,9 +1,9 @@
 <?php
-namespace FFan\Uis\Base;
+namespace FFan\Dop\Uis;
 
 /**
  * Class ActionException 用于业务中断
- * @package FFan\Uis\Base
+ * @package FFan\Dop\Uis
  */
 class ActionException extends \Exception
 {

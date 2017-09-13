@@ -1,6 +1,6 @@
 <?php
 
-namespace FFan\Uis\Base;
+namespace FFan\Dop\Uis;
 
 use ffan\dop\AutoLoader;
 use FFan\Std\Common\Config as FFanConfig;
@@ -13,7 +13,7 @@ use FFan\Std\Event\EventManager;
 
 /**
  * Class Application
- * @package FFan\Uis\Base
+ * @package FFan\Dop\Uis
  */
 class Application
 {
@@ -38,16 +38,6 @@ class Application
     private $error_handler;
 
     /**
-     * @var Request get请求数据
-     */
-    private $query_request;
-
-    /**
-     * @var Request post请求数据
-     */
-    private $post_request;
-
-    /**
      * @var self
      */
     private static $instance;
@@ -58,10 +48,19 @@ class Application
     private $filter_list;
 
     /**
+     * @var string 应用的主命名空间
+     */
+    private $app_ns;
+
+    /**
      * Application constructor.
      */
     public function __construct()
     {
+        if (!defined('APP_PATH')) {
+            define('APP_PATH', FFanEnv::getRootPath());
+        }
+
         //这一步保证MainLogger初始化
         FFan::getLogger();
         Debug::init();
@@ -191,15 +190,13 @@ class Application
             return;
         }
 
-        //将get参数  和 post 参数封装起来，不允许直接调用
+        //将get参数  和 post 改名，不允许直接调用
         if (!empty($_GET)) {
-            $this->query_request = new Request($_GET);
-            $GLOBALS['ORIGINAL_GET'] = $_GET;
+            $GLOBALS['__GET_'] = $_GET;
             $_GET = array();
         }
         if (!empty($_POST)) {
-            $this->post_request = new Request($_POST);
-            $GLOBALS['ORIGINAL_POST'] = $_GET;
+            $GLOBALS['__POST_'] = $_GET;
             $_POST = array();
         }
         call_user_func(array($page_obj, $call_func), $action_args);
@@ -228,14 +225,19 @@ class Application
         if (Response::STATUS_OK !== $this->response->getStatus()) {
             return;
         }
-        $mock_class = 'ffan\\dop\\plugin\\mock\\' . $this->app_name . '\\Mock' . $u_app_name . $u_page_name;
+        $ns = $this->getAppNameSpace();
+        $mock_class = $ns . '\\plugin\\mock\\Mock' . $u_app_name . $u_page_name;
         if (!AutoLoader::dopExist($mock_class)) {
             $this->response->setStatus(Response::STATUS_PAGE_NOT_FOUND, 'Mock class ' . $mock_class . ' not found');
             return;
         }
         $method = 'mock' . $action_name . 'Response';
-        //var_dump($mock_class . '::' . $method);
-        /** @var DopResponse $data */
+        $ref = new \ReflectionClass($mock_class);
+        if (!$ref->hasMethod($method)) {
+            $this->response->setStatus(Response::STATUS_PAGE_NOT_FOUND, 'Mock action ' . $mock_class . '::' . $method . ' not found');
+            return;
+        }
+        /** @var IResponse $data */
         $data = call_user_func(array($mock_class, $method));
         $this->response->setResponse($data);
     }
@@ -244,32 +246,30 @@ class Application
      * 实例化参数为对象
      * @param string $page_name
      * @param string $action_name
-     * @return DopRequest|null
+     * @return IRequest|null
      */
     private function getActionArgs($page_name, $action_name)
     {
-        $protocol_path = $this->getDopProtocolPath();
         //dop protocol 文件是强制加载的
         /** @noinspection PhpIncludeInspection */
-        require_once $protocol_path . 'dop.php';
+        require_once APP_PATH . 'protocol/dop.php';
         $class_name = $action_name . 'Request';
-        $dop_class = 'ffan\\dop\\' . $this->app_name . '\\' . $page_name . '\\' . $class_name;
+        $ns = $this->getAppNameSpace();
+        $dop_class = $ns . '\\' . $page_name . '\\' . $class_name;
         $action_args = null;
         if (!AutoLoader::dopExist($dop_class)) {
             return null;
         }
-        /** @var DopRequest $request */
+        /** @var IRequest $request */
         $request = new $dop_class();
         //如果是Json post过来的数据
         if (isset($_SERVER['HTTP_CONTENT_TYPE']) && 'application/json' === $_SERVER['HTTP_CONTENT_TYPE']) {
             $tmp_post = json_decode(file_get_contents("php://input"), true);
             if (JSON_ERROR_NONE === json_last_error()) {
                 $_POST = $tmp_post;
-                $request->arrayUnpack($_POST);
             }
-        } else {
-            $request->arrayUnpack($_GET + $_POST);
         }
+        $request->arrayUnpack($_GET + $_POST);
         //数据有效性验证
         if (!$request->validateCheck()) {
             $this->response->setStatus(Response::STATUS_PARAM_INVALID, $request->getValidateErrorMsg());
@@ -279,13 +279,18 @@ class Application
     }
 
     /**
-     * 获取协议文件所在目录
+     * 获取应用的主命名空间
      * @return string
      */
-    private function getDopProtocolPath()
+    private function getAppNameSpace()
     {
-        //todo config
-        return APP_PATH . 'protocol/';
+        if (null === $this->app_ns) {
+            $this->app_ns = FFanConfig::getString('app_namespace');
+            if (null === $this->app_ns) {
+                $this->app_ns = 'FFan\Dop';
+            }
+        }
+        return $this->app_ns;
     }
 
     /**
@@ -326,30 +331,6 @@ class Application
     public function getResponse()
     {
         return $this->response;
-    }
-
-    /**
-     * 获取$_GET数据
-     * @return Request
-     */
-    public function getQueryRequest()
-    {
-        if (null === $this->query_request) {
-            $this->query_request = new Request($_GET);
-        }
-        return $this->query_request;
-    }
-
-    /**
-     * 获取$_POST请求数据
-     * @return Request
-     */
-    public function getPostRequest()
-    {
-        if (null === $this->post_request) {
-            $this->post_request = new Request($_POST);
-        }
-        return $this->post_request;
     }
 
     /**

@@ -15,7 +15,8 @@
     "ffan/std-logger": "1.*",
     "ffan/std-console": "1.*",
     "ffan/php-dop": "1.*",
-    "ffan/std-async": "1.*"
+    "ffan/std-async": "1.*",
+    "ffan/std-http": "1.*"
   },
   "autoload": {
     "psr-4": {

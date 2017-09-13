@@ -1,12 +1,11 @@
 <?php
 
-namespace FFan\Uis\Base;
+namespace FFan\Dop\Uis;
 
 use FFan\Std\Common\Config;
 use FFan\Std\Common\Env;
 use FFan\Std\Common\Utils;
 use FFan\Std\Console\Debug;
-use FFan\Std\Event\EventManager;
 use FFan\Std\Logger\FileLogger;
 use FFan\Std\Logger\LogHelper;
 use FFan\Std\Logger\LogLevel;
@@ -14,7 +13,7 @@ use FFan\Std\Logger\LogRouter;
 
 /**
  * Class FFan 基础类
- * @package ffan\php
+ * @package FFan\Dop\Uis
  */
 class FFan
 {
@@ -78,4 +77,3 @@ class FFan
         self::getLogger()->debug('[DEBUG]' . $log_str);
     }
 }
-

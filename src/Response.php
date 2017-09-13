@@ -1,6 +1,6 @@
 <?php
 
-namespace FFan\Uis\Base;
+namespace FFan\Dop\Uis;
 
 /**
  * Class Response
@@ -25,7 +25,7 @@ class Response
     const STATUS_INTERNAL_ERROR = 104;
 
     /**
-     * @var DopResponse 数据输出
+     * @var IResponse 数据输出
      */
     private $response_data;
 
@@ -42,6 +42,11 @@ class Response
      * @var array 附加数据
      */
     private $append_data;
+
+    /**
+     * @var array
+     */
+    private $output_type = self::TYPE_JSON;
 
     /**
      * 设置状态码
@@ -61,9 +66,9 @@ class Response
 
     /**
      * 设置数据
-     * @param DopResponse $data
+     * @param IResponse $data
      */
-    public function setResponse(DopResponse $data)
+    public function setResponse(IResponse $data)
     {
         $this->response_data = $data;
     }
@@ -95,15 +100,18 @@ class Response
 
     /**
      * 获取输出数据
-     * @param int $data_type 输出类型 1: json 2: 二进制base64串
      * @return mixed
      */
-    public function getOutput($data_type = self::TYPE_JSON)
+    public function getOutput()
     {
         if (null === $this->response_data) {
             return $this->response_data;
         }
-        $result = $this->response_data->arrayPack(true);
+        if (self::TYPE_JSON === $this->output_type) {
+            $result = $this->response_data->arrayPack(true);
+        } else {
+            $result = array('binaryData' => base64_encode($this->response_data->binaryEncode(false, true)));
+        }
         return $result;
     }
 
