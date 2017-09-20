@@ -54,13 +54,11 @@ class Application
 
     /**
      * Application constructor.
+     * @param array $config
      */
-    public function __construct()
+    public function __construct(array $config)
     {
-        if (!defined('APP_PATH')) {
-            define('APP_PATH', FFanEnv::getRootPath());
-        }
-
+        FFanConfig::init($config);
         //这一步保证MainLogger初始化
         FFan::getLogger();
         Debug::init();
@@ -76,32 +74,17 @@ class Application
     }
 
     /**
-     * 初始化一个app，包括私有的config
-     */
-    private function initAppConfig()
-    {
-        //加载APP私有配置
-        $config_file = APP_PATH . 'config.php';
-        if (is_file($config_file)) {
-            /** @noinspection PhpIncludeInspection */
-            $app_config = require($config_file);
-            FFanConfig::addArray($app_config);
-        }
-        $init_file = APP_PATH . 'init.php';
-        if (is_file($init_file)) {
-            /** @noinspection PhpIncludeInspection */
-            require_once $init_file;
-        }
-    }
-
-    /**
      * 运行
      */
     public function run()
     {
         $event_mrg = EventManager::instance();
         try {
-            $this->initAppConfig();
+            $init_file = APP_PATH . 'init.php';
+            if (is_file($init_file)) {
+                /** @noinspection PhpIncludeInspection */
+                require_once $init_file;
+            }
             //内置mock处理 (生产环境不支持 mock)
             if ($this->server_info->isMockAction() && !FFanEnv::isProduct()) {
                 $this->mockAction();
@@ -357,9 +340,6 @@ class Application
      */
     public static function getInstance()
     {
-        if (null === self::$instance) {
-            self::$instance = new self();
-        }
         return self::$instance;
     }
 }
