@@ -2,7 +2,7 @@
 
 namespace FFan\Dop\Uis;
 
-use ffan\dop\AutoLoader;
+use FFan\Dop\AutoLoader;
 use FFan\Std\Common\Config as FFanConfig;
 use FFan\Std\Common\Env as FFanEnv;
 use FFan\Std\Common\Utils as FFanUtils;
@@ -68,9 +68,10 @@ class Application
         }
         self::$instance = $this;
         $this->server_info = ServerHandler::getInstance();
+        $this->app_name = $this->server_info->getAppName();
+        define('APP_PATH', ROOT_PATH . 'apps/' . $this->app_name . '/');
         $this->response = new Response();
         $this->init();
-        $this->app_name = $this->server_info->getAppName();
     }
 
     /**
