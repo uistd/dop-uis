@@ -18,6 +18,7 @@ class View
      */
     const VIEW_TYPE_JSON = 1;
     const VIEW_TYPE_TPL = 2;
+    const VIEW_TYPE_ECHO = 3;
 
     /**
      * @var Response
@@ -33,6 +34,16 @@ class View
      * @var mixed 模板参数
      */
     private $view_tpl;
+
+    /**
+     * @var string echo 输出的时候的header
+     */
+    private $content_type;
+
+    /**
+     * @var string 输出的内容
+     */
+    private $echo_content;
 
     /**
      * View constructor.
@@ -64,6 +75,25 @@ class View
     }
 
     /**
+     * 直接输出内容
+     * @param string $echo_str 需要显示的内容
+     * @param string $content_type
+     */
+    public function setViewEcho($echo_str, $content_type = 'text/html')
+    {
+        if (!is_string($echo_str)) {
+            throw new \InvalidArgumentException('Invalud echo_str');
+        }
+        $this->view_type = self::VIEW_TYPE_ECHO;
+        if (null === $echo_str) {
+            $this->echo_content = $echo_str;
+        } else {
+            $this->echo_content .= $echo_str;
+        }
+        $this->content_type = $content_type;
+    }
+
+    /**
      * 显示
      */
     public function view()
@@ -73,10 +103,27 @@ class View
         //调试模式下，显示 控制 台
         if (Debug::isDebugMode()) {
             Debug::displayDebugMessage($data);
-        } elseif (self::VIEW_TYPE_JSON === $this->view_type) {
-            header('Content-Type: application/json; charset=UTF-8');
+            return;
+        }
+        //json输出
+        if (self::VIEW_TYPE_JSON === $this->view_type) {
+            header('Content-Type: application/json; charset=utf-8');
             echo json_encode($data, JSON_UNESCAPED_UNICODE);
-        } elseif (self::VIEW_TYPE_TPL === $this->view_type) {
+            return;
+        }
+        //其它方式
+        if (Response::STATUS_OK !== $data['status']) {
+            echo $data['message'];
+            return;
+        }
+        //echo输出
+        if (self::VIEW_TYPE_ECHO === $this->view_type) {
+            if (is_string($this->content_type) && !empty($this->content_type)) {
+                header('Content-Type: ' . $this->content_type);
+            }
+            echo $this->echo_content;
+        } //模板方式
+        elseif (self::VIEW_TYPE_TPL === $this->view_type) {
             echo Tpl::get($this->view_tpl, $data);
         }
     }
