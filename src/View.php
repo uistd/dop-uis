@@ -73,21 +73,21 @@ class View
         $result = array(
             'status' => $status,
             'message' => $message,
-            'data' => null
         );
+        $result_data = null;
+        if (Response::STATUS_OK === $status && $this->response) {
+            $result_data = $this->response->getOutput();
+            //如果 数组只有一层, 并且key 也是 data
+            if (isset($result_data['data']) && 1 === count($result_data)) {
+                $result_data = $result_data['data'];
+            }
+        }
         //附加数据输出， 但是不会覆盖主体 status message data 字段
         $append_data = $this->response->getAppendData();
         if (0 === $status && !empty($append_data)) {
             $result += $append_data;
         }
-        if (Response::STATUS_OK === $status && $this->response) {
-            $data = $this->response->getOutput();
-            //如果 数组只有一层, 并且key 也是 data
-            if (isset($data['data']) && 1 === count($data)) {
-                $data = $data['data'];
-            }
-            $result['data'] = $data;
-        }
+        $result['data'] = $result_data;
         return $result;
     }
 }

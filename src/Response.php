@@ -2,6 +2,8 @@
 
 namespace FFan\Dop\Uis;
 
+use FFan\Std\Common\Config;
+
 /**
  * Class Response
  * @package ffan\php\base
@@ -42,11 +44,6 @@ class Response
      * @var array 附加数据
      */
     private $append_data;
-
-    /**
-     * @var array
-     */
-    private $output_type = self::TYPE_JSON;
 
     /**
      * 设置状态码
@@ -107,12 +104,72 @@ class Response
         if (null === $this->response_data) {
             return $this->response_data;
         }
-        if (self::TYPE_JSON === $this->output_type) {
+        $output_type = $this->getOutputType();
+        if (self::TYPE_JSON === $output_type) {
             $result = $this->response_data->arrayPack(true);
         } else {
-            $result = array('binaryData' => base64_encode($this->response_data->binaryEncode(false, true)));
+            $app = Application::getInstance();
+            $app->getResponse()->appendData('DopBinary', 1);
+            $mask_key = $this->getBinaryMaskKey();
+            $bin_str = $this->response_data->binaryEncode(false, true, $mask_key);
+            $result = base64_encode($bin_str);
         }
         return $result;
+    }
+
+    /**
+     * 获取二进制输出的加密key
+     * @return string|null
+     */
+    private function getBinaryMaskKey()
+    {
+        //二进制输出时，对内容的加密串
+        $mask_config = Config::get('dop_binary_mask');
+        if (is_array($mask_config)) {
+            $server_info = Application::getInstance()->getServerInfo();
+            $app_name = $server_info->getAppName();
+            $page_name = $server_info->getPageName();
+            $action_name = $server_info->getActionName();
+            $full_key = $app_name . '/' . $page_name . '/' . $action_name;
+            if (isset($mask_config[$full_key])) {
+                return $mask_config[$full_key];
+            }
+            $page_key = $app_name . '/' . $page_name . '/*';
+            if (isset($mask_config[$page_key])) {
+                return $mask_config[$page_key];
+            }
+            $app_key = $app_name . '/*';
+            if (isset($mask_config[$app_key])) {
+                return $mask_config[$app_key];
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 获取返回值类型
+     * @return int
+     */
+    private function getOutputType()
+    {
+        //如果 是在header中指定二进制
+        if (isset($_SERVER['HTTP_ACCEPT_BINARY']) && 'dop' === $_SERVER['HTTP_ACCEPT_BINARY']) {
+            return self::TYPE_BINARY;
+        }
+        //在Request参数中指定
+        if (isset($_REQUEST['RESPONSE_TYPE'])) {
+            if ('binary' === $_REQUEST['RESPONSE_TYPE']) {
+                return self::TYPE_BINARY;
+            } elseif ('json' === $_REQUEST['RESPONSE_TYPE']) {
+                return self::TYPE_JSON;
+            }
+        }
+        //配置中指定
+        $output_type_conf = Config::getString('response_type');
+        if ('binary' === $output_type_conf) {
+            return self::TYPE_BINARY;
+        }
+        return self::TYPE_JSON;
     }
 
     /**
