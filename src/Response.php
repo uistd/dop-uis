@@ -109,7 +109,7 @@ class Response
             $result = $this->response_data->arrayPack(true);
         } else {
             $app = Application::getInstance();
-            $app->getResponse()->appendData('DopBinary', 1);
+            $app->getResponse()->appendData('dopBinary', true);
             $mask_key = $this->getBinaryMaskKey();
             $bin_str = $this->response_data->binaryEncode(false, true, $mask_key);
             $result = base64_encode($bin_str);
