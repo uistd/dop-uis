@@ -2,8 +2,10 @@
 
 namespace FFan\Dop\Uis;
 
+use FFan\Std\Common\Config;
 use FFan\Std\Common\Env as FFanEnv;
 use FFan\Std\Console\Debug;
+use FFan\Std\Tpl\Tpl;
 
 /**
  * Class View 显示类
@@ -12,9 +14,25 @@ use FFan\Std\Console\Debug;
 class View
 {
     /**
+     * 数据显示方式
+     */
+    const VIEW_TYPE_JSON = 1;
+    const VIEW_TYPE_TPL = 2;
+
+    /**
      * @var Response
      */
     private $response;
+
+    /**
+     * @var int 显示方式
+     */
+    private $view_type = self::VIEW_TYPE_JSON;
+
+    /**
+     * @var mixed 模板参数
+     */
+    private $view_tpl;
 
     /**
      * View constructor.
@@ -23,6 +41,26 @@ class View
     public function __construct(Response $response)
     {
         $this->response = $response;
+    }
+
+    /**
+     * 设置以模板方式显示
+     * @param string $tpl_name
+     * @throws ActionException
+     */
+    public function setViewTpl($tpl_name)
+    {
+        if (!is_string($tpl_name) || empty($tpl_name)) {
+            throw new \InvalidArgumentException('Invalid tpl_name');
+        }
+        $app = Application::getInstance();
+        //设置tpl的路径
+        Config::add('ffan-tpl', array('tpl_dir' => 'apps/' . $app->getAppName() . '/view'));
+        if (!Tpl::hasTpl($tpl_name, $tpl_file)) {
+            throw new ActionException("Tpl '" . $tpl_file . "' not found", '105');
+        }
+        $this->view_type = self::VIEW_TYPE_TPL;
+        $this->view_tpl = $tpl_name;
     }
 
     /**
@@ -35,9 +73,11 @@ class View
         //调试模式下，显示 控制 台
         if (Debug::isDebugMode()) {
             Debug::displayDebugMessage($data);
-        } else {
+        } elseif (self::VIEW_TYPE_JSON === $this->view_type) {
             header('Content-Type: application/json; charset=UTF-8');
             echo json_encode($data, JSON_UNESCAPED_UNICODE);
+        } elseif (self::VIEW_TYPE_TPL === $this->view_type) {
+            echo Tpl::get($this->view_tpl, $data);
         }
     }
 

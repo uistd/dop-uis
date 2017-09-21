@@ -53,6 +53,11 @@ class Application
     private $app_ns;
 
     /**
+     * @var View 视图对象
+     */
+    private $view;
+
+    /**
      * Application constructor.
      * @param array $config
      */
@@ -71,6 +76,7 @@ class Application
         $this->app_name = $this->server_info->getAppName();
         define('APP_PATH', ROOT_PATH . 'apps/' . $this->app_name . '/');
         $this->response = new Response();
+        $this->view = new View($this->response);
         $this->init();
         spl_autoload_register([$this, 'autoLoader']);
     }
@@ -111,8 +117,7 @@ class Application
      */
     public function renderView()
     {
-        $view = new View($this->response);
-        $view->view();
+        $this->view->view();
         exit(0);
     }
 
@@ -324,6 +329,15 @@ class Application
     public function getAppName()
     {
         return $this->app_name;
+    }
+
+    /**
+     * 获取视图对象
+     * @return View
+     */
+    public function getView()
+    {
+        return $this->view;
     }
 
     /**
