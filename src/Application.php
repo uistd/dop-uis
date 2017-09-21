@@ -72,6 +72,7 @@ class Application
         define('APP_PATH', ROOT_PATH . 'apps/' . $this->app_name . '/');
         $this->response = new Response();
         $this->init();
+        spl_autoload_register([$this, 'autoLoader']);
     }
 
     /**
@@ -149,6 +150,8 @@ class Application
             /** @noinspection PhpIncludeInspection */
             require_once $sdk_dop_file;
         }
+        $ns = $this->getAppNameSpace() . '\\' . $u_page_name;
+        $class_name = $ns . '\\' . $class_name;
         $page_obj = new $class_name($this);
         $call_func = 'action' . $action_name;
         if (!method_exists($page_obj, $call_func)) {
@@ -168,7 +171,7 @@ class Application
             }
         }
 
-        $action_args = $this->getActionArgs($page_name, $action_name);
+        $action_args = $this->getActionArgs($u_page_name, $action_name);
         //在获取参数的时候,参数 验证不通过
         if (null === $action_args && Response::STATUS_OK !== $this->response->getStatus()) {
             return;
@@ -199,18 +202,17 @@ class Application
         }
         /** @noinspection PhpIncludeInspection */
         require_once $include_file;
-        $u_app_name = FFanStr::camelName($this->app_name);
         $page_name = $this->server_info->getPageName();
         $u_page_name = FFanStr::camelName($page_name);
         $action_name = $this->server_info->getActionName();
-        $class_name = $u_app_name . $u_page_name . 'Page';
+        $app_ns = $this->getAppNameSpace();
+        $class_name = $app_ns . '\\' . $u_page_name . 'Page';
         $this->requirePageFile($class_name, false);
-        $this->getActionArgs($page_name, $action_name);
+        $this->getActionArgs($u_page_name, $action_name);
         if (Response::STATUS_OK !== $this->response->getStatus()) {
             return;
         }
-        $ns = $this->getAppNameSpace();
-        $mock_class = $ns . '\\plugin\\mock\\Mock' . $u_app_name . $u_page_name;
+        $mock_class = $app_ns . '\\Plugin\\Mock\\' . $u_page_name . '\\Mock' . $u_page_name;
         if (!AutoLoader::dopExist($mock_class)) {
             $this->response->setStatus(Response::STATUS_PAGE_NOT_FOUND, 'Mock class ' . $mock_class . ' not found');
             return;
@@ -269,10 +271,8 @@ class Application
     private function getAppNameSpace()
     {
         if (null === $this->app_ns) {
-            $this->app_ns = FFanConfig::getString('app_namespace');
-            if (null === $this->app_ns) {
-                $this->app_ns = 'FFan\Dop';
-            }
+            $u_app_name = FFanStr::camelName($this->app_name);
+            $this->app_ns = 'Uis\\' . $u_app_name;
         }
         return $this->app_ns;
     }
@@ -342,5 +342,36 @@ class Application
     public static function getInstance()
     {
         return self::$instance;
+    }
+
+    /**
+     * 一些内置的自动加载
+     * @param string $class_name
+     */
+    public function autoLoader($class_name)
+    {
+        //以Uis\App开始的
+        $main_ns = $this->getAppNameSpace();
+        if (0 !== strpos($class_name, $main_ns)) {
+            return;
+        }
+        $sub_name = substr($class_name, strlen($main_ns) + 1);
+        //如果 还有命名空间
+        if (false !== strpos($sub_name, '\\')) {
+            $tmp_path = array();
+            $name_arr = FFanStr::split($sub_name, '\\');
+            //最后一个是类名
+            $class_name = array_pop($name_arr);
+            foreach ($tmp_path as $item) {
+                $tmp_path[] = FFanStr::underlineName($item);
+            }
+            $sub_name = join('/', $tmp_path) . '/' . $class_name;
+        }
+        $file = FFanEnv::getRootPath() .'apps/'. $this->app_name .'/'. $sub_name .'.php';
+        if (!is_file($file)) {
+            return;
+        }
+        /** @noinspection PhpIncludeInspection */
+        require_once $file;
     }
 }

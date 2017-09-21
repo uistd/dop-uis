@@ -35,7 +35,7 @@ class Page
     }
 
     /**
-     * 中止代码执行
+     * 终止代码执行，返回指定的status
      * @param int $code
      * @throws ActionException
      */
@@ -46,12 +46,14 @@ class Page
     }
 
     /**
-     * 终止代码执行
+     * 直接将apiResult返回，并终止代码执行
      * @param ApiResult $result
      * @throws ActionException
      */
-    public function response(ApiResult $result)
+    public function returnResult(ApiResult $result)
     {
-        throw new ActionException($result->message, $result->status);
+        $status = isset($result->status) ? $result->status : 500;
+        $message = isset($result->message) ? $result->message : 'error';
+        throw new ActionException($message, $status);
     }
 }
