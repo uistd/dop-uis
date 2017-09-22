@@ -149,12 +149,6 @@ class Application
         if (!$this->requirePageFile($class_name)) {
             return;
         }
-        //sdk dop
-        $sdk_dop_file = APP_PATH . 'sdk/dop.php';
-        if (is_file($sdk_dop_file)) {
-            /** @noinspection PhpIncludeInspection */
-            require_once $sdk_dop_file;
-        }
         $ns = $this->getAppNameSpace() . '\\' . $u_page_name;
         $class_name = $ns . '\\' . $class_name;
         $page_obj = new $class_name($this);
