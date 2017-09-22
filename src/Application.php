@@ -217,7 +217,7 @@ class Application
         if (Response::STATUS_OK !== $this->response->getStatus()) {
             return;
         }
-        $mock_class = $app_ns . '\\Plugin\\Mock\\' . $u_page_name . '\\Mock' . $u_page_name;
+        $mock_class = $app_ns . '\\Plugin\\Mock\\Mock' . $u_page_name;
         if (!AutoLoader::dopExist($mock_class)) {
             $this->response->setStatus(Response::STATUS_PAGE_NOT_FOUND, 'Mock class ' . $mock_class . ' not found');
             return;
@@ -381,7 +381,7 @@ class Application
             }
             $sub_name = join('/', $tmp_path) . '/' . $class_name;
         }
-        $file = FFanEnv::getRootPath() .'apps/'. $this->app_name .'/'. $sub_name .'.php';
+        $file = FFanEnv::getRootPath() . 'apps/' . $this->app_name . '/' . $sub_name . '.php';
         if (!is_file($file)) {
             return;
         }
