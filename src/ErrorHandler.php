@@ -67,7 +67,7 @@ class ErrorHandler
      * 处理未被catch的异常
      * @param \Throwable $exception
      */
-    public function handleException(\Throwable $exception)
+    public function handleException($exception)
     {
         //重置，避免在处理的过程中又发生异常而死循环
         restore_exception_handler();
