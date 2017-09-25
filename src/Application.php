@@ -2,7 +2,6 @@
 
 namespace FFan\Dop\Uis;
 
-use FFan\Dop\AutoLoader;
 use FFan\Std\Common\Config as FFanConfig;
 use FFan\Std\Common\Env as FFanEnv;
 use FFan\Std\Common\Utils as FFanUtils;
@@ -146,11 +145,12 @@ class Application
         $action_name = $this->server_info->getActionName();
         $u_page_name = FFanStr::camelName($page_name);
         $class_name = $u_page_name . 'Page';
-        if (!$this->requirePageFile($class_name)) {
+        $ns = $this->getAppNameSpace() . '\\Page\\';
+        $class_name = $ns . $class_name;
+        if (!class_exists($class_name)) {
+            $this->response->setStatus(Response::STATUS_PAGE_NOT_FOUND);
             return;
         }
-        $ns = $this->getAppNameSpace() . '\\' . $u_page_name;
-        $class_name = $ns . '\\' . $class_name;
         $page_obj = new $class_name($this);
         $call_func = 'action' . $action_name;
         if (!method_exists($page_obj, $call_func)) {
@@ -193,7 +193,7 @@ class Application
      */
     private function mockAction()
     {
-        $mock_path = APP_PATH . 'protocol/plugin_mock/';
+        $mock_path = APP_PATH . 'Protocol/plugin_mock/';
         $include_file = FFanUtils::joinFilePath($mock_path, 'include.php');
         if (!is_file($include_file)) {
             $this->response->setStatus(Response::STATUS_PAGE_NOT_FOUND, 'Mock plugin error');
@@ -205,14 +205,12 @@ class Application
         $u_page_name = FFanStr::camelName($page_name);
         $action_name = $this->server_info->getActionName();
         $app_ns = $this->getAppNameSpace();
-        $class_name = $app_ns . '\\' . $u_page_name . 'Page';
-        $this->requirePageFile($class_name, false);
         $this->getActionArgs($u_page_name, $action_name);
         if (Response::STATUS_OK !== $this->response->getStatus()) {
             return;
         }
-        $mock_class = $app_ns . '\\Plugin\\Mock\\Mock' . $u_page_name;
-        if (!AutoLoader::dopExist($mock_class)) {
+        $mock_class = $app_ns . '\\Protocol\\Plugin\\Mock\\Mock' . $u_page_name;
+        if (!class_exists($mock_class)) {
             $this->response->setStatus(Response::STATUS_PAGE_NOT_FOUND, 'Mock class ' . $mock_class . ' not found');
             return;
         }
@@ -235,14 +233,11 @@ class Application
      */
     private function getActionArgs($page_name, $action_name)
     {
-        //dop protocol 文件是强制加载的
-        /** @noinspection PhpIncludeInspection */
-        require_once APP_PATH . 'protocol/dop.php';
         $class_name = $action_name . 'Request';
         $ns = $this->getAppNameSpace();
-        $dop_class = $ns . '\\' . $page_name . '\\' . $class_name;
+        $dop_class = $ns . '\\Protocol\\' . $page_name . '\\' . $class_name;
         $action_args = null;
-        if (!AutoLoader::dopExist($dop_class)) {
+        if (!class_exists($dop_class)) {
             return null;
         }
         /** @var IRequest $request */
@@ -274,28 +269,6 @@ class Application
             $this->app_ns = 'Uis\\' . $u_app_name;
         }
         return $this->app_ns;
-    }
-
-    /**
-     * 加载 page 类(controller)
-     * @param string $file_name 类名
-     * @param bool $set_error 如果类不存在,是否要set error
-     * @return bool
-     */
-    private function requirePageFile($file_name, $set_error = true)
-    {
-        $page_file = APP_PATH . 'page/' . $file_name . '.php';
-        //如果没有文件
-        if (!is_file($page_file)) {
-            FFan::debug('Page file:' . $page_file . ' not found');
-            if ($set_error) {
-                $this->response->setStatus(Response::STATUS_PAGE_NOT_FOUND);
-            }
-            return false;
-        }
-        /** @noinspection PhpIncludeInspection */
-        require_once $page_file;
-        return true;
     }
 
     /**
@@ -364,18 +337,8 @@ class Application
             return;
         }
         $sub_name = substr($class_name, strlen($main_ns) + 1);
-        //如果 还有命名空间
-        if (false !== strpos($sub_name, '\\')) {
-            $tmp_path = array();
-            $name_arr = FFanStr::split($sub_name, '\\');
-            //最后一个是类名
-            $class_name = array_pop($name_arr);
-            foreach ($tmp_path as $item) {
-                $tmp_path[] = FFanStr::underlineName($item);
-            }
-            $sub_name = join('/', $tmp_path) . '/' . $class_name;
-        }
-        $file = FFanEnv::getRootPath() . 'apps/' . $this->app_name . '/' . $sub_name . '.php';
+        $path_name = str_replace('\\', '/', $sub_name);
+        $file = FFanEnv::getRootPath() . 'apps/' . $this->app_name . '/' . $path_name . '.php';
         if (!is_file($file)) {
             return;
         }
