@@ -117,7 +117,6 @@ class Application
     public function renderView()
     {
         $this->view->view();
-        exit(0);
     }
 
     /**

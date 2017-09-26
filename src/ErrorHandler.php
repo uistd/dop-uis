@@ -4,6 +4,7 @@ namespace FFan\Dop\Uis;
 
 use FFan\Std\Console\Debug;
 use FFan\Std\Common\Env;
+use FFan\Std\Event\EventManager;
 
 /**
  * Class ErrorHandle
@@ -60,7 +61,7 @@ class ErrorHandler
         //php代码级错处处理
         set_error_handler([$this, 'handleError']);
         //fatal error处理
-        register_shutdown_function([$this, 'handleFatalError']);
+        EventManager::instance()->attach(EventManager::SHUTDOWN_EVENT, [$this, 'handleFatalError'], 10000);
     }
 
     /**
@@ -124,7 +125,6 @@ class ErrorHandler
         FFan::getLogger()->emergency('PHP FATAL ERROR');
         $this->handleError($error['type'], $error['message'], $error['file'], $error['line']);
         $this->displayException('Fatal error handler');
-        exit(1);
     }
 
     /**
