@@ -257,6 +257,10 @@ class Application
         return $request;
     }
 
+    /**
+     * 判断header里是否 指定是json请求
+     * @return bool
+     */
     private function isJsonRequest()
     {
         if (isset($_SERVER['HTTP_CONTENT_TYPE'])) {

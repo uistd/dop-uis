@@ -23,7 +23,10 @@
   "autoload": {
     "psr-4": {
       "FFan\\Dop\\Uis\\": "src"
-    }
+    },
+    "files": [
+      "src/helper.php"
+    ]
   },
   "config": {
     "secure-http": false
