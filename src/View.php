@@ -165,7 +165,7 @@ class View
         if (Response::STATUS_OK === $status && $this->response) {
             $result_data = $this->response->getOutput();
             //如果 数组只有一层, 并且key 也是 data
-            if (isset($result_data['data']) && 1 === count($result_data)) {
+            if (is_array($result_data) && isset($result_data['data']) && 1 === count($result_data)) {
                 $result_data = $result_data['data'];
             }
         }
