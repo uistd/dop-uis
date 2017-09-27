@@ -260,7 +260,7 @@ class Application
     private function isJsonRequest()
     {
         if (isset($_SERVER['HTTP_CONTENT_TYPE'])) {
-            return strpos($_SERVER['HTTP_CONTENT_TYPE'], '/json') !== flase || strpos($_SERVER['HTTP_CONTENT_TYPE'], '+json') !== false;
+            return strpos($_SERVER['HTTP_CONTENT_TYPE'], '/json') !== false || strpos($_SERVER['HTTP_CONTENT_TYPE'], '+json') !== false;
         }
 
         return false;
