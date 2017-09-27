@@ -242,7 +242,7 @@ class Application
         /** @var IRequest $request */
         $request = new $dop_class();
         //如果是Json post过来的数据
-        if (isset($_SERVER['HTTP_CONTENT_TYPE']) && 'application/json' === $_SERVER['HTTP_CONTENT_TYPE']) {
+        if ($this->isJsonRequest()) {
             $tmp_post = json_decode(file_get_contents("php://input"), true);
             if (JSON_ERROR_NONE === json_last_error()) {
                 $_POST = $tmp_post;
@@ -255,6 +255,15 @@ class Application
             return null;
         }
         return $request;
+    }
+
+    private function isJsonRequest()
+    {
+        if (isset($_SERVER['HTTP_CONTENT_TYPE'])) {
+            return strpos($_SERVER['HTTP_CONTENT_TYPE'], '/json') !== flase || strpos($_SERVER['HTTP_CONTENT_TYPE'], '+json') !== false;
+        }
+
+        return false;
     }
 
     /**
