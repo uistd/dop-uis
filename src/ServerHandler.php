@@ -175,7 +175,6 @@ class ServerHandler
     /**
      * 获取scriptFile
      * @return string
-     * @throws \HttpInvalidParamException
      */
     public function getScriptFile()
     {
@@ -192,7 +191,7 @@ class ServerHandler
         } elseif (!empty($_SERVER['DOCUMENT_ROOT']) && strpos($script_file, $_SERVER['DOCUMENT_ROOT']) === 0) {
             $script_file = str_replace('\\', '/', str_replace($_SERVER['DOCUMENT_ROOT'], '', $script_file));
         } else {
-            throw new \HttpInvalidParamException('Unable to determine the entry script URL.');
+            throw new \RuntimeException('Unable to determine the entry script URL.');
         }
         return $script_file;
     }
@@ -226,26 +225,25 @@ class ServerHandler
     /**
      * 获取请求uri
      * @return string
-     * @throws \HttpInvalidParamException
      */
     public function getRequestUri()
     {
         if (isset($_SERVER['REQUEST_URI'])) {
-            $requestUri = $_SERVER['REQUEST_URI'];
-            if ($requestUri !== '' && $requestUri[0] !== '/') {
-                $requestUri = preg_replace('/^(http|https):\/\/[^\/]+/i', '', $requestUri);
+            $request_uri = $_SERVER['REQUEST_URI'];
+            if ($request_uri !== '' && $request_uri[0] !== '/') {
+                $request_uri = preg_replace('/^(http|https):\/\/[^\/]+/i', '', $request_uri);
             }
         } elseif (isset($_SERVER['HTTP_X_REWRITE_URL'])) { // IIS
-            $requestUri = $_SERVER['HTTP_X_REWRITE_URL'];
+            $request_uri = $_SERVER['HTTP_X_REWRITE_URL'];
         } elseif (isset($_SERVER['ORIG_PATH_INFO'])) { // IIS 5.0 CGI
-            $requestUri = $_SERVER['ORIG_PATH_INFO'];
+            $request_uri = $_SERVER['ORIG_PATH_INFO'];
             if (!empty($_SERVER['QUERY_STRING'])) {
-                $requestUri .= '?' . $_SERVER['QUERY_STRING'];
+                $request_uri .= '?' . $_SERVER['QUERY_STRING'];
             }
         } else {
-            throw new \HttpInvalidParamException('Unable to determine the request URI.');
+            $request_uri = '/';
         }
-        return $requestUri;
+        return $request_uri;
     }
 
     /**
