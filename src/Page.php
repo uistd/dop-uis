@@ -50,7 +50,7 @@ class Page
      * @param ApiResult $result
      * @throws ActionException
      */
-    public function returnResult(ApiResult $result)
+    public function errorResult(ApiResult $result)
     {
         $status = isset($result->status) ? $result->status : 500;
         $message = isset($result->message) ? $result->message : 'error';
