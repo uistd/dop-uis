@@ -192,7 +192,7 @@ class Application
      */
     private function mockAction()
     {
-        $mock_path = APP_PATH . 'Protocol/plugin_mock/';
+        $mock_path = ROOT_PATH . 'protocol/plugin_mock/';
         $include_file = FFanUtils::joinFilePath($mock_path, 'include.php');
         if (!is_file($include_file)) {
             $this->response->setStatus(Response::STATUS_PAGE_NOT_FOUND, 'Mock plugin error');
@@ -203,12 +203,12 @@ class Application
         $page_name = $this->server_info->getPageName();
         $u_page_name = FFanStr::camelName($page_name);
         $action_name = $this->server_info->getActionName();
-        $app_ns = $this->getAppNameSpace();
         $this->getActionArgs($u_page_name, $action_name);
         if (Response::STATUS_OK !== $this->response->getStatus()) {
             return;
         }
-        $mock_class = $app_ns . '\\Protocol\\Plugin\\Mock\\Mock' . $u_page_name;
+        $u_app_name = FFanStr::camelName($this->app_name);
+        $mock_class = '\\Protocol\\Plugin\\Mock\\' . $u_app_name . '\\Mock' . $u_app_name . $u_page_name;
         if (!class_exists($mock_class)) {
             $this->response->setStatus(Response::STATUS_PAGE_NOT_FOUND, 'Mock class ' . $mock_class . ' not found');
             return;
@@ -233,8 +233,7 @@ class Application
     private function getActionArgs($page_name, $action_name)
     {
         $class_name = $action_name . 'Request';
-        $ns = $this->getAppNameSpace();
-        $dop_class = $ns . '\\Protocol\\' . $page_name . '\\' . $class_name;
+        $dop_class = '\\Protocol\\' . FFanStr::camelName($this->app_name) . '\\' . $page_name . '\\' . $class_name;
         $action_args = null;
         if (!class_exists($dop_class)) {
             return null;
