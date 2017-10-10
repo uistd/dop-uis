@@ -31,11 +31,6 @@ class ServerHandler
     private $path_info;
 
     /**
-     * @var int 版本
-     */
-    private $version = 1;
-
-    /**
      * @var self
      */
     private static $instance;
@@ -67,11 +62,12 @@ class ServerHandler
         }
         $path_arr = FFanStr::split($route_path, '/');
         $count = count($path_arr);
+        $version = 1;
         //api gateway 是以 /v1/app/page/action 的方式过来的
         if ($count > 0) {
             $first_path = $path_arr[0];
             if (preg_match('/^v[\d]+$/', $first_path)) {
-                $this->version = (int)(substr($first_path, 1));
+                $version = (int)(substr($first_path, 1));
                 --$count;
                 array_shift($path_arr);
             }
@@ -99,16 +95,10 @@ class ServerHandler
         $this->app_name = $app_name;
         $this->page_name = $page_name;
         $this->action_name = FFanStr::camelName($action_name);
+        if ($version > 1) {
+            $this->action_name .= 'V'. $version;
+        }
         FFan::debug('App:'. $app_name . ' Page:'. $this->page_name . ' Action:'. $this->action_name);
-    }
-
-    /**
-     * 获取版本号
-     * @return int
-     */
-    public function getVersion()
-    {
-        return $this->version;
     }
 
     /**
