@@ -16,7 +16,7 @@ function debug()
  */
 function dd($var)
 {
-    \FFan\Std\Console\Debug::varFormat($var);
+    echo \FFan\Std\Console\Debug::varFormat($var);
     die;
 }
 
