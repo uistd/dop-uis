@@ -222,6 +222,18 @@ class Application
         /** @var IResponse $data */
         $data = call_user_func(array($mock_class, $method));
         $this->response->setResponse($data);
+
+        //如果 存在mock方法，将mock出来的对象 调用 mock 方法 二次加工
+        $class_name = $u_page_name . 'Mock';
+        $ns = $this->getAppNameSpace() . '\\Mock\\';
+        $class_name = $ns . $class_name;
+        if (class_exists($class_name)) {
+            $mock_obj = new $class_name();
+            $call_func = 'mock' . $action_name;
+            if (method_exists($mock_obj, $call_func)) {
+                call_user_func([$mock_obj, $call_func], $data);
+            }
+        }
     }
 
     /**
