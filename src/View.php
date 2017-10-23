@@ -21,6 +21,11 @@ class View
     const VIEW_TYPE_ECHO = 3;
 
     /**
+     * @var bool 是否已经显示 过了
+     */
+    private $is_display = false;
+
+    /**
      * @var Response
      */
     private $response;
@@ -100,6 +105,11 @@ class View
     {
         $this->clearOutputBuffer();
         $data = $this->viewData();
+        //防止在 shutdown function里出现错误，然后调用错误输出
+        if ($this->is_display) {
+            return;
+        }
+        $this->is_display = true;
         //调试模式下，显示 控制 台
         if (Debug::isDebugMode()) {
             Debug::displayDebugMessage($data);
