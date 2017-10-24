@@ -1,4 +1,5 @@
 <?php
+use FFan\Dop\Uis\FFan;
 
 /**
  * 打印
@@ -36,5 +37,17 @@ function config($key, $default = null)
  */
 function pr()
 {
-   call_user_func_array('print_r', func_get_args());
+    call_user_func_array('print_r', func_get_args());
+}
+
+/**
+ * 打印从请求到现在一共花的时间
+ */
+function debugTotalTime()
+{
+    if (!isset($_SERVER['REQUEST_TIME_FLOAT'])) {
+        return;
+    }
+    $cost_time = round((microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']) * 1000, 2) . 'ms';
+    FFan::getLogger()->info('TOTAL_TIME:' . $cost_time);
 }
