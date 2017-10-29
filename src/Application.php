@@ -92,9 +92,9 @@ class Application
                 /** @noinspection PhpIncludeInspection */
                 require_once $init_file;
             }
-            //内置mock处理 (生产环境不支持 mock)
-            if ($this->server_info->isMockAction() && !FFanEnv::isProduct()) {
-                $this->mockAction();
+            //特殊请求
+            if (isset($_GET['TOOL_REQUEST']) && !FFanEnv::isProduct()) {
+                $this->toolAction();
             } else {
                 $this->actionDispatch();
                 $event_mrg->trigger(EventDriver::EVENT_COMMIT);
@@ -367,5 +367,30 @@ class Application
         }
         /** @noinspection PhpIncludeInspection */
         require_once $file;
+    }
+
+    /**
+     * 内置工具加载
+     */
+    private function toolAction()
+    {
+        $tool = $_GET['TOOL_REQUEST'];
+        if ('mock' === $tool) {
+            $this->mockAction();
+        } else {
+            $tool_class_name = FFanStr::camelName($tool) . 'Tool';
+            $file = FFanEnv::getRootPath() . 'tool/' . $tool_class_name . '.php';
+            if (is_file($file)) {
+                $full_class = '\\Uis\Tool\\' . $tool_class_name;
+                /** @noinspection PhpIncludeInspection */
+                require_once $file;
+                $tool_obj = new $full_class($this);
+                if ($tool_obj instanceof Tool) {
+                    $tool_obj->action();
+                }
+            } else {
+                $this->response->setStatus(500, 'tool not found');
+            }
+        }
     }
 }
