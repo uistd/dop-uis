@@ -174,13 +174,17 @@ class View
         $result_data = null;
         if (Response::STATUS_OK === $status && $this->response) {
             $result_data = $this->response->getOutput();
-            $result += $result_data;
+            //如果 数组只有一层, 并且key 也是 data
+            if (is_array($result_data) && isset($result_data['data']) && 1 === count($result_data)) {
+                $result_data = $result_data['data'];
+            }
         }
         //附加数据输出， 但是不会覆盖主体 status message data 字段
         $append_data = $this->response->getAppendData();
         if (0 === $status && !empty($append_data)) {
             $result += $append_data;
         }
+        $result['data'] = $result_data;
         return $result;
     }
 }
