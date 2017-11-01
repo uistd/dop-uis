@@ -25,5 +25,5 @@ abstract class Tool
     /**
      * 主执行函数
      */
-    abstract function action();
+    abstract public function action();
 }
