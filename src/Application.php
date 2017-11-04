@@ -192,14 +192,6 @@ class Application
      */
     private function mockAction()
     {
-        $mock_path = ROOT_PATH . 'protocol/plugin_mock/';
-        $include_file = FFanUtils::joinFilePath($mock_path, 'include.php');
-        if (!is_file($include_file)) {
-            $this->response->setStatus(Response::STATUS_PAGE_NOT_FOUND, 'Mock plugin error');
-            return;
-        }
-        /** @noinspection PhpIncludeInspection */
-        require_once $include_file;
         $page_name = $this->server_info->getPageName();
         $u_page_name = FFanStr::camelName($page_name);
         $action_name = $this->server_info->getActionName();
@@ -208,7 +200,7 @@ class Application
             return;
         }
         $u_app_name = FFanStr::camelName($this->app_name);
-        $mock_class = '\\Protocol\\Plugin\\Mock\\' . $u_app_name . '\\Mock' . $u_app_name . $u_page_name;
+        $mock_class = '\\Protocol\\PluginMock\\' . $u_app_name . '\\Mock' . $u_app_name . $u_page_name;
         if (!class_exists($mock_class)) {
             $this->response->setStatus(Response::STATUS_PAGE_NOT_FOUND, 'Mock class ' . $mock_class . ' not found');
             return;
@@ -374,7 +366,7 @@ class Application
      */
     private function toolAction()
     {
-        $tool = $_GET['TOOL_REQUEST'];
+        $tool = strtolower($_GET['TOOL_REQUEST']);
         if ('mock' === $tool) {
             $this->mockAction();
         } else {
