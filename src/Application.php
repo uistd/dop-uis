@@ -174,16 +174,6 @@ class Application
         if (null === $action_args && Response::STATUS_OK !== $this->response->getStatus()) {
             return;
         }
-
-        //将get参数  和 post 改名，不允许直接调用
-        if (!empty($_GET)) {
-            $GLOBALS['__GET_'] = $_GET;
-            $_GET = array();
-        }
-        if (!empty($_POST)) {
-            $GLOBALS['__POST_'] = $_GET;
-            $_POST = array();
-        }
         call_user_func(array($page_obj, $call_func), $action_args);
     }
 

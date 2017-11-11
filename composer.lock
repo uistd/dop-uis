@@ -1,0 +1,478 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "e03f36bca6e5ee897dbfebb79b1b844c",
+    "packages": [
+        {
+            "name": "ffan/php-dop",
+            "version": "2.0.1",
+            "source": {
+                "type": "git",
+                "url": "http://gitlab.ffan.biz/dop/php.git",
+                "reference": "9aa852dc05769967569ad0c002f9d294325d1747"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "http://composer.intra.ffan.com/repo/private/dists/ffan/php-dop/2.0.1.0/9aa852dc05769967569ad0c002f9d294325d1747.zip",
+                "reference": "9aa852dc05769967569ad0c002f9d294325d1747",
+                "shasum": null,
+                "mirrors": [
+                    {
+                        "url": "http://composer.intra.ffan.com/repo/private/dists/%package%/%version%/%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
+            },
+            "require": {
+                "ffan/std-common": "2.*",
+                "php": ">=5.5.0"
+            },
+            "type": "composer",
+            "autoload": {
+                "psr-4": {
+                    "FFan\\Dop\\": "src"
+                }
+            },
+            "authors": [
+                {
+                    "name": "huangshunzhao",
+                    "email": "huangshunzhao@wanda.cn",
+                    "role": "Founder and project lead"
+                }
+            ],
+            "description": "FFan dop php common files",
+            "keywords": [
+                "dop",
+                "ffan",
+                "php"
+            ],
+            "time": "2017-09-21T05:54:23+00:00"
+        },
+        {
+            "name": "ffan/std-async",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "http://gitlab.ffan.biz/php/async.git",
+                "reference": "76f3c270f3d9ab94f2eab7751ee433d31b891ac9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "http://composer.intra.ffan.com/repo/private/dists/ffan/std-async/1.0.1.0/76f3c270f3d9ab94f2eab7751ee433d31b891ac9.zip",
+                "reference": "76f3c270f3d9ab94f2eab7751ee433d31b891ac9",
+                "shasum": null,
+                "mirrors": [
+                    {
+                        "url": "http://composer.intra.ffan.com/repo/private/dists/%package%/%version%/%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
+            },
+            "archive": {
+                "exclude": [
+                    "test",
+                    ".gitignore"
+                ]
+            },
+            "require": {
+                "ffan/std-event": "2.*",
+                "ffan/std-logger": "1.*",
+                "php": ">=5.5.0"
+            },
+            "type": "composer",
+            "autoload": {
+                "psr-4": {
+                    "FFan\\Std\\Async\\": "src"
+                }
+            },
+            "authors": [
+                {
+                    "name": "huangshunzhao",
+                    "email": "huangshunzhao@wanda.cn",
+                    "role": "Founder and project lead"
+                }
+            ],
+            "description": "FFan php async components",
+            "keywords": [
+                "async",
+                "ffan",
+                "php"
+            ],
+            "time": "2017-09-06T06:28:50+00:00"
+        },
+        {
+            "name": "ffan/std-cache",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "http://gitlab.ffan.biz/php/ffan-cache.git",
+                "reference": "cef6cd0a0aa38ca886db53b583c6e30f771b9f27"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "http://composer.intra.ffan.com/repo/private/dists/ffan/std-cache/1.0.1.0/cef6cd0a0aa38ca886db53b583c6e30f771b9f27.zip",
+                "reference": "cef6cd0a0aa38ca886db53b583c6e30f771b9f27",
+                "shasum": null,
+                "mirrors": [
+                    {
+                        "url": "http://composer.intra.ffan.com/repo/private/dists/%package%/%version%/%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
+            },
+            "archive": {
+                "exclude": [
+                    "test",
+                    ".gitignore"
+                ]
+            },
+            "require": {
+                "ffan/std-common": "2.*",
+                "ffan/std-console": "1.*",
+                "ffan/std-event": "2.*",
+                "ffan/std-logger": "1.*",
+                "php": ">=5.5.0"
+            },
+            "type": "composer",
+            "autoload": {
+                "psr-4": {
+                    "FFan\\Std\\Cache\\": "src"
+                }
+            },
+            "authors": [
+                {
+                    "name": "huangshunzhao",
+                    "email": "huangshunzhao@wanda.cn",
+                    "role": "Founder"
+                }
+            ],
+            "description": "FFan cache",
+            "keywords": [
+                "cache",
+                "ffan",
+                "std"
+            ],
+            "time": "2017-09-02T09:10:32+00:00"
+        },
+        {
+            "name": "ffan/std-common",
+            "version": "2.0.2",
+            "source": {
+                "type": "git",
+                "url": "http://gitlab.ffan.biz/php/ffan-utils.git",
+                "reference": "a33a9e7d646b4cf7186e881083cd3280b24e9788"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "http://composer.intra.ffan.com/repo/private/dists/ffan/std-common/2.0.2.0/a33a9e7d646b4cf7186e881083cd3280b24e9788.zip",
+                "reference": "a33a9e7d646b4cf7186e881083cd3280b24e9788",
+                "shasum": null,
+                "mirrors": [
+                    {
+                        "url": "http://composer.intra.ffan.com/repo/private/dists/%package%/%version%/%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
+            },
+            "archive": {
+                "exclude": [
+                    "test",
+                    ".gitignore"
+                ]
+            },
+            "require": {
+                "ext-mbstring": "*",
+                "php": ">=5.5.0"
+            },
+            "type": "composer",
+            "autoload": {
+                "psr-4": {
+                    "FFan\\Std\\Common\\": "src"
+                }
+            },
+            "authors": [
+                {
+                    "name": "huangshunzhao",
+                    "email": "huangshunzhao@wanda.cn",
+                    "role": "Founder and project lead"
+                }
+            ],
+            "description": "FFan php utils components",
+            "keywords": [
+                "ffan",
+                "php",
+                "utils"
+            ],
+            "time": "2017-09-01T08:08:50+00:00"
+        },
+        {
+            "name": "ffan/std-console",
+            "version": "1.0.7",
+            "source": {
+                "type": "git",
+                "url": "http://gitlab.ffan.biz/php/console.git",
+                "reference": "eb3879087d4bbab225111edcde7a5b5d5c850738"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "http://composer.intra.ffan.com/repo/private/dists/ffan/std-console/1.0.7.0/eb3879087d4bbab225111edcde7a5b5d5c850738.zip",
+                "reference": "eb3879087d4bbab225111edcde7a5b5d5c850738",
+                "shasum": null,
+                "mirrors": [
+                    {
+                        "url": "http://composer.intra.ffan.com/repo/private/dists/%package%/%version%/%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
+            },
+            "archive": {
+                "exclude": [
+                    "test",
+                    ".gitignore"
+                ]
+            },
+            "require": {
+                "ffan/std-common": "2.*",
+                "ffan/std-logger": "1.*",
+                "php": ">=5.5.0"
+            },
+            "type": "composer",
+            "autoload": {
+                "psr-4": {
+                    "FFan\\Std\\Console\\": "src"
+                }
+            },
+            "authors": [
+                {
+                    "name": "huangshunzhao",
+                    "email": "huangshunzhao@wanda.cn",
+                    "role": "Founder"
+                }
+            ],
+            "description": "FFan STD Console",
+            "keywords": [
+                "console",
+                "ffan"
+            ],
+            "time": "2017-09-07T08:18:50+00:00"
+        },
+        {
+            "name": "ffan/std-event",
+            "version": "2.0.1",
+            "source": {
+                "type": "git",
+                "url": "http://gitlab.ffan.biz/php/ffan-event.git",
+                "reference": "96d3d07c51503abf53838d41879ad3eab910a644"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "http://composer.intra.ffan.com/repo/private/dists/ffan/std-event/2.0.1.0/96d3d07c51503abf53838d41879ad3eab910a644.zip",
+                "reference": "96d3d07c51503abf53838d41879ad3eab910a644",
+                "shasum": null,
+                "mirrors": [
+                    {
+                        "url": "http://composer.intra.ffan.com/repo/private/dists/%package%/%version%/%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
+            },
+            "archive": {
+                "exclude": [
+                    "test",
+                    ".gitignore"
+                ]
+            },
+            "require": {
+                "php": ">=5.5.0"
+            },
+            "type": "composer",
+            "autoload": {
+                "psr-4": {
+                    "FFan\\Std\\Event\\": "src"
+                }
+            },
+            "authors": [
+                {
+                    "name": "huangshunzhao",
+                    "email": "huangshunzhao@wanda.cn",
+                    "role": "Founder"
+                }
+            ],
+            "description": "FFan std event",
+            "keywords": [
+                "event",
+                "ffan",
+                "std"
+            ],
+            "time": "2017-09-02T08:49:12+00:00"
+        },
+        {
+            "name": "ffan/std-http",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "http://gitlab.ffan.biz/php/ffan-http.git",
+                "reference": "c3d51f5e54159d5a3a8d823672f6ec5eabd93276"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "http://composer.intra.ffan.com/repo/private/dists/ffan/std-http/1.0.0.0/c3d51f5e54159d5a3a8d823672f6ec5eabd93276.zip",
+                "reference": "c3d51f5e54159d5a3a8d823672f6ec5eabd93276",
+                "shasum": null,
+                "mirrors": [
+                    {
+                        "url": "http://composer.intra.ffan.com/repo/private/dists/%package%/%version%/%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
+            },
+            "archive": {
+                "exclude": [
+                    "test",
+                    ".gitignore"
+                ]
+            },
+            "require": {
+                "ffan/std-async": "1.*",
+                "ffan/std-common": "2.*",
+                "ffan/std-console": "1.*",
+                "ffan/std-logger": "1.*",
+                "php": ">=5.5.0"
+            },
+            "type": "composer",
+            "autoload": {
+                "psr-4": {
+                    "FFan\\Std\\Http\\": "src/"
+                }
+            },
+            "authors": [
+                {
+                    "name": "huangshunzhao",
+                    "email": "huangshunzhao@wanda.cn",
+                    "role": "Founder"
+                }
+            ],
+            "description": "FFan http components",
+            "keywords": [
+                "ffan",
+                "http",
+                "php"
+            ],
+            "time": "2017-09-11T09:27:24+00:00"
+        },
+        {
+            "name": "ffan/std-logger",
+            "version": "1.0.4",
+            "source": {
+                "type": "git",
+                "url": "http://gitlab.ffan.biz/php/logger.git",
+                "reference": "7869d11b06418e5a6e7e014083ee5a858071caa1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "http://composer.intra.ffan.com/repo/private/dists/ffan/std-logger/1.0.4.0/7869d11b06418e5a6e7e014083ee5a858071caa1.zip",
+                "reference": "7869d11b06418e5a6e7e014083ee5a858071caa1",
+                "shasum": null,
+                "mirrors": [
+                    {
+                        "url": "http://composer.intra.ffan.com/repo/private/dists/%package%/%version%/%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
+            },
+            "archive": {
+                "exclude": [
+                    "test",
+                    ".gitignore"
+                ]
+            },
+            "require": {
+                "ffan/std-common": "2.*",
+                "php": ">=5.5.0"
+            },
+            "type": "composer",
+            "autoload": {
+                "psr-4": {
+                    "FFan\\Std\\Logger\\": "src"
+                }
+            },
+            "authors": [
+                {
+                    "name": "huangshunzhao",
+                    "email": "huangshunzhao@wanda.cn",
+                    "role": "Founder"
+                }
+            ],
+            "description": "FFan STD Logger",
+            "keywords": [
+                "ffan",
+                "logger"
+            ],
+            "time": "2017-09-01T08:16:45+00:00"
+        },
+        {
+            "name": "ffan/std-tpl",
+            "version": "1.0.3",
+            "source": {
+                "type": "git",
+                "url": "http://gitlab.ffan.biz/php/ffan-tpl.git",
+                "reference": "ed84e2335fa46ff11be162556343f52283b72d4f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "http://composer.intra.ffan.com/repo/private/dists/ffan/std-tpl/1.0.3.0/ed84e2335fa46ff11be162556343f52283b72d4f.zip",
+                "reference": "ed84e2335fa46ff11be162556343f52283b72d4f",
+                "shasum": null,
+                "mirrors": [
+                    {
+                        "url": "http://composer.intra.ffan.com/repo/private/dists/%package%/%version%/%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
+            },
+            "archive": {
+                "exclude": [
+                    "test",
+                    ".gitignore"
+                ]
+            },
+            "require": {
+                "ffan/std-common": "2.*",
+                "php": ">=5.5.0"
+            },
+            "type": "composer",
+            "autoload": {
+                "psr-4": {
+                    "FFan\\Std\\Tpl\\": "src"
+                }
+            },
+            "authors": [
+                {
+                    "name": "huangshunzhao",
+                    "email": "huangshunzhao@wanda.cn",
+                    "role": "Founder and project lead"
+                }
+            ],
+            "description": "FFan tpl",
+            "keywords": [
+                "ffan",
+                "php",
+                "tpl"
+            ],
+            "time": "2017-09-21T10:16:28+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "dev",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": {
+        "php": ">=5.6.0"
+    },
+    "platform-dev": []
+}
