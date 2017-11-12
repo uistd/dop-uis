@@ -62,22 +62,22 @@ class Application
      */
     public function __construct(array $config)
     {
-        FFanConfig::init($config);
         //这一步保证MainLogger初始化
-        FFan::getLogger();
-        Debug::init();
-        ob_start();
         if (null !== self::$instance) {
             throw new \RuntimeException('Application is a singleton class');
         }
-        self::$instance = $this;
+        ob_start();
+        FFanConfig::init($config);
         $this->server_info = ServerHandler::getInstance();
+        spl_autoload_register([$this, 'autoLoader']);
+        FFan::getLogger();
+        Debug::init();
+        self::$instance = $this;
         $this->app_name = $this->server_info->getAppName();
         define('APP_PATH', ROOT_PATH . 'apps/' . $this->app_name . '/');
         $this->response = new Response();
         $this->view = new View($this->response);
         $this->init();
-        spl_autoload_register([$this, 'autoLoader']);
     }
 
     /**
