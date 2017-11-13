@@ -237,7 +237,7 @@ class Application
         //如果是Json post过来的数据
         if ($this->isJsonRequest()) {
             $tmp_post = json_decode(file_get_contents("php://input"), true);
-            if (JSON_ERROR_NONE === json_last_error()) {
+            if (JSON_ERROR_NONE === json_last_error() && is_array($tmp_post)) {
                 $_POST = $tmp_post;
             }
         }
