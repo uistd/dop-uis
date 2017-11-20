@@ -361,7 +361,7 @@ class Application
             $this->mockAction();
         } else {
             $tool_class_name = FFanStr::camelName($tool) . 'Tool';
-            $file = FFanEnv::getRootPath() . 'tool/' . $tool_class_name . '.php';
+            $file = FFanEnv::getRootPath() . 'tool/class/' . $tool_class_name . '.php';
             if (is_file($file)) {
                 $full_class = '\\Uis\Tool\\' . $tool_class_name;
                 /** @noinspection PhpIncludeInspection */

@@ -87,7 +87,7 @@ class View
     public function setViewEcho($echo_str, $content_type = 'text/html')
     {
         if (!is_string($echo_str)) {
-            throw new \InvalidArgumentException('Invalud echo_str');
+            throw new \InvalidArgumentException('Invalid echo_str');
         }
         $this->view_type = self::VIEW_TYPE_ECHO;
         if (null === $echo_str) {
@@ -169,23 +169,14 @@ class View
         $message = $this->response->getMessage();
         $result = array(
             'status' => $status,
-            'message' => $message,
+            'message' => $message
         );
-        $result_data = null;
-        if (Response::STATUS_OK === $status && $this->response) {
-            $result_data = $this->response->getOutput();
-            //如果 数组只有一层, 并且key 也是 data
-            if (is_array($result_data) && isset($result_data['data'])) {
-                $result += $result_data;
-            } else {
-                $result['data'] = $result_data;
-            }
+        if (Response::STATUS_OK !== $status || !$this->response) {
+            $result['data'] = null;
+            return $result;
         }
-        //附加数据输出， 但是不会覆盖主体 status message data 字段
-        $append_data = $this->response->getAppendData();
-        if (0 === $status && !empty($append_data)) {
-            $result += $append_data;
-        }
-        return $result;
+        $result_data = $this->response->getOutput();
+        $result_data += $result;
+        return $result_data;
     }
 }

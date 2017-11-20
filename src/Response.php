@@ -3,6 +3,7 @@
 namespace FFan\Dop\Uis;
 
 use FFan\Std\Common\Config;
+use FFan\Std\Common\Str;
 
 /**
  * Class Response
@@ -25,11 +26,13 @@ class Response
     const STATUS_PARAM_INVALID = 103;
     //内部错误
     const STATUS_INTERNAL_ERROR = 104;
+    //未找到协议
+    const STATUS_PROTOCOL_NOT_FOUND = 105;
 
     /**
-     * @var IResponse 数据输出
+     * @var Result 数据输出
      */
-    private $response_data;
+    private $result;
 
     /** @var int 状态码
      */
@@ -39,11 +42,6 @@ class Response
      * @var string 消息内容
      */
     private $message;
-
-    /**
-     * @var array 附加数据
-     */
-    private $append_data;
 
     /**
      * 设置状态码
@@ -63,56 +61,60 @@ class Response
 
     /**
      * 设置数据
-     * @param IResponse $data
+     * @param Result $data
      */
-    public function setResponse(IResponse $data)
+    public function setResult(Result $data)
     {
-        $this->response_data = $data;
+        $this->result = $data;
     }
 
     /**
-     * 设置和 status message data 平级的数组
-     * @param string $key
-     * @param mixed $value
+     * 直接设置Response的 data 字段
+     * @param mixed $data
+     * @throws ActionException
      */
-    public function appendData($key, $value)
+    public function setData($data)
     {
-        if (!is_string($key) || empty($key)) {
-            throw new \InvalidArgumentException('Invalid append data key');
-        }
-        //如果 key 已经存在了， 自动重命名
-        if (isset($this->append_data[$key])) {
-            //如果 key 后面 带 数字
-            if (preg_match('/[a-zA-Z_]([0-9]+$)/', $key, $match) > 0) {
-                $num = (int)$match[1] + 1;
-                $key .= '_' . $num;
-            } else {
-                $key .= '1';
+        if (null === $this->result) {
+            $server_info = ServerHandler::getInstance();
+            $app_name = Str::camelName($server_info->getAppName());
+            $page_name = Str::camelName($server_info->getPageName());
+            $action_name = Str::camelName($server_info->getActionName());
+            $class_name = $action_name . 'Response';
+            $response_class = '\\Protocol\\' . $app_name . '\\' . $page_name . '\\' . $class_name;
+            if (!class_exists($response_class)) {
+                throw new ActionException('No response protocol', self::STATUS_PROTOCOL_NOT_FOUND);
             }
-            $this->appendData($key, $value);
+            $result = new $response_class();
+            $result->data = $data;
+            $this->setResult($result);
         } else {
-            $this->append_data[$key] = $value;
+            $this->result->data = $data;
         }
     }
 
     /**
      * 获取输出数据
-     * @return mixed
+     * @return array
      */
     public function getOutput()
     {
-        if (null === $this->response_data) {
-            return $this->response_data;
+        if (null === $this->result) {
+            return array();
         }
         $output_type = $this->getOutputType();
         if (self::TYPE_JSON === $output_type) {
-            $result = $this->response_data->arrayPack(true);
+            $result = $this->result->arrayPack(true);
         } else {
-            $app = Application::getInstance();
-            $app->getResponse()->appendData('dopBinary', true);
             $mask_key = $this->getBinaryMaskKey();
-            $bin_str = $this->response_data->binaryEncode(false, true, $mask_key);
-            $result = base64_encode($bin_str);
+            $bin_str = $this->result->binaryEncode(false, true, $mask_key);
+            $result = array('data' => base64_encode($bin_str), 'dopBinary' => true);
+        }
+        if (null !== $this->result->status) {
+            $result['status'] = $this->result->status;
+        }
+        if (null !== $this->result->message) {
+            $result['message'] = $this->result->message;
         }
         return $result;
     }
@@ -200,14 +202,5 @@ class Response
             default:
                 return 'unknown';
         }
-    }
-
-    /**
-     * 获取 附加数据
-     * @return null|array
-     */
-    public function getAppendData()
-    {
-        return $this->append_data;
     }
 }
