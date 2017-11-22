@@ -201,9 +201,11 @@ class Application
             $this->response->setStatus(Response::STATUS_PAGE_NOT_FOUND, 'Mock action ' . $mock_class . '::' . $method . ' not found');
             return;
         }
-        /** @var IResponse $data */
+        /** @var Result $data */
         $data = call_user_func(array($mock_class, $method));
-        $this->response->setResponse($data);
+        $data->status = 0;
+        $data->message = 'MOCK DATA';
+        $this->response->setResult($data);
 
         //如果 存在mock方法，将mock出来的对象 调用 mock 方法 二次加工
         $class_name = $u_page_name . 'Mock';
