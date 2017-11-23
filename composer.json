@@ -24,10 +24,7 @@
     "psr-4": {
       "FFan\\Dop\\Uis\\": "src",
       "FFan\\Uis\\Work\\": "work"
-    },
-    "files": [
-      "src/helper.php"
-    ]
+    }
   },
   "config": {
     "secure-http": false

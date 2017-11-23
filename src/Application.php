@@ -4,7 +4,6 @@ namespace FFan\Dop\Uis;
 
 use FFan\Std\Common\Config as FFanConfig;
 use FFan\Std\Common\Env as FFanEnv;
-use FFan\Std\Common\Utils as FFanUtils;
 use FFan\Std\Common\Str as FFanStr;
 use FFan\Std\Console\Debug;
 use FFan\Std\Event\EventDriver;
@@ -62,22 +61,21 @@ class Application
      */
     public function __construct(array $config)
     {
-        //这一步保证MainLogger初始化
         if (null !== self::$instance) {
             throw new \RuntimeException('Application is a singleton class');
         }
         ob_start();
         FFanConfig::init($config);
+        FFan::getLogger();
+        $this->init();
         $this->server_info = ServerHandler::getInstance();
         spl_autoload_register([$this, 'autoLoader']);
-        FFan::getLogger();
-        Debug::init();
         self::$instance = $this;
         $this->app_name = $this->server_info->getAppName();
         define('APP_PATH', ROOT_PATH . 'apps/' . $this->app_name . '/');
         $this->response = new Response();
         $this->view = new View($this->response);
-        $this->init();
+        Debug::init();
     }
 
     /**
@@ -124,9 +122,6 @@ class Application
      */
     private function init()
     {
-        if (!isset($config['extension'])) {
-            $config['extension'] = [];
-        }
         $charset = FFanEnv::getCharset();
         ini_set('default_charset', $charset);
         $timezone = FFanEnv::getTimezone();
