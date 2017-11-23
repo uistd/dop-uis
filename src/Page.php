@@ -37,12 +37,15 @@ class Page
     /**
      * 终止代码执行，返回指定的status
      * @param int $code
+     * @param string $message
      * @throws ActionException
      */
-    public function quit($code = 10000)
+    public function quit($code = 10000, $message = '')
     {
-        $msg = isset(static::$return_code[$code]) ? static::$return_code[$code] : '操作失败';
-        throw new ActionException($msg, $code);
+        if (empty($message)) {
+            $message = isset(static::$return_code[$code]) ? static::$return_code[$code] : '操作失败';
+        }
+        throw new ActionException($message, $code);
     }
 
     /**
