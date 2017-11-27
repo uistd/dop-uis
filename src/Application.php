@@ -64,7 +64,6 @@ class Application
         if (null !== self::$instance) {
             throw new \RuntimeException('Application is a singleton class');
         }
-        ob_start();
         FFanConfig::init($config);
         FFan::getLogger();
         $this->init();
