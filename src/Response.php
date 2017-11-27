@@ -99,12 +99,18 @@ class Response
      */
     public function getOutput()
     {
+        $result = array();
         if (null === $this->result) {
-            return array();
+            return $result;
         }
         $output_type = $this->getOutputType();
         if (self::TYPE_JSON === $output_type) {
-            $result = $this->result->arrayPack(true);
+            $data = $this->result->arrayPack(true);
+            if (is_array($data) && isset($data['data'])) {
+                $result['data'] = $data['data'];
+            } else {
+                $result['data'] = $data;
+            }
         } else {
             $mask_key = $this->getBinaryMaskKey();
             $bin_str = $this->result->binaryEncode(false, true, $mask_key);
