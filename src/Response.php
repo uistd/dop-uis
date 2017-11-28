@@ -106,8 +106,8 @@ class Response
         $output_type = $this->getOutputType();
         if (self::TYPE_JSON === $output_type) {
             $data = $this->result->arrayPack(true);
-            if (is_array($data) && isset($data['data'])) {
-                $result['data'] = $data['data'];
+            if (is_array($data)) {
+                $result = $data;
             } else {
                 $result['data'] = $data;
             }
