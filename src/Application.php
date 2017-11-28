@@ -4,6 +4,7 @@ namespace FFan\Dop\Uis;
 
 use FFan\Std\Common\Config as FFanConfig;
 use FFan\Std\Common\Env as FFanEnv;
+use FFan\Std\Common\Ip;
 use FFan\Std\Common\Str as FFanStr;
 use FFan\Std\Console\Debug;
 use FFan\Std\Event\EventDriver;
@@ -89,8 +90,8 @@ class Application
                 /** @noinspection PhpIncludeInspection */
                 require_once $init_file;
             }
-            //特殊请求
-            if (isset($_GET['TOOL_REQUEST']) && !FFanEnv::isProduct()) {
+            //特殊请求， 仅内网生效
+            if (isset($_GET['TOOL_REQUEST']) && !Ip::isInternal(Ip::get())) {
                 $this->toolAction();
             } else {
                 $this->actionDispatch();
