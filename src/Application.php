@@ -91,7 +91,7 @@ class Application
                 require_once $init_file;
             }
             //特殊请求， 仅内网生效
-            if (isset($_GET['TOOL_REQUEST']) && !Ip::isInternal(Ip::get())) {
+            if (isset($_GET['TOOL_REQUEST']) && Ip::isInternal(Ip::get())) {
                 $this->toolAction();
             } else {
                 $this->actionDispatch();
