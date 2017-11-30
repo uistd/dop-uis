@@ -14,35 +14,22 @@ use FFan\Std\Logger\LogRouter;
 class Crontab
 {
     /**
-     * @var int 休眠时间
-     */
-    private $sleep_time;
-
-    /**
      * @var LogRouter
      */
     private $logger;
 
     /**
-     * @var string 日志目录
+     * @var
      */
-    protected static $log_path = 'crontab';
-
-    /**
-     * @var bool 是否循环执行
-     */
-    protected $is_loop = false;
-
-    /**
-     * @var int 如果是循环执行，每次执行的间隔
-     */
-    protected $loop_sleep = 1000;
+    private $app_name;
 
     /**
      * Crontab constructor.
+     * @param string $app_name
      */
-    public function __construct()
+    public function __construct($app_name)
     {
+        $this->app_name = $app_name;
         $this->initLogger();
         $process_count = Manager::processCount($this->crontabName());
         if ($process_count > 0) {
@@ -50,14 +37,10 @@ class Crontab
             return;
         }
         $this->logMsg('start');
-        if ($this->is_loop) {
-            $this->loop();
-        } else {
-            try {
-                $this->action();
-            } catch (\Exception $exception) {
-                Debug::recordException($exception);
-            }
+        try {
+            $this->action();
+        } catch (\Exception $exception) {
+            Debug::recordException($exception);
         }
     }
 
@@ -67,8 +50,8 @@ class Crontab
     private function initLogger()
     {
         $this->logger = LogHelper::getLogRouter();
-
-        new FileLogger(self::$log_path, $this->crontabName());
+        $log_path = 'crontab/' . $this->app_name;
+        new FileLogger($log_path, $this->crontabName());
     }
 
     /**
@@ -93,29 +76,6 @@ class Crontab
     protected function action()
     {
 
-    }
-
-    /**
-     * 主循环
-     */
-    private function loop()
-    {
-        while ($this->is_loop) {
-            $start_time = microtime(true);
-            try {
-                $this->action();
-            } catch (\Exception $exception) {
-                Debug::recordException($exception);
-            }
-            $now_time = microtime(true);
-            $cost_time = $now_time - $start_time;
-            //转成 微秒
-            $cost_time *= 1000;
-            $sleep_time = $this->sleep_time - $cost_time;
-            if ($sleep_time > 0) {
-                usleep($sleep_time);
-            }
-        }
     }
 
     /**

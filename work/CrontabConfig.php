@@ -1,5 +1,7 @@
 <?php
+
 namespace FFan\Uis\Work;
+
 use FFan\Std\Common\Str;
 
 /**
@@ -17,6 +19,11 @@ class CrontabConfig
      * @var string
      */
     private $config;
+
+    /**
+     * @var bool 是否可用
+     */
+    private $is_valid = true;
 
     /**
      * CrontabConfig constructor.
@@ -39,17 +46,18 @@ class CrontabConfig
         $conf_arr = Str::split($this->config, ' ');
         if (5 !== count($conf_arr)) {
             $this->error();
+            return;
         }
         //解析分钟
         $this->parseItem($conf_arr[0], 'm', 60);
         //解析小时
-        $this->parseItem($conf_arr[0], 'h', 24);
+        $this->parseItem($conf_arr[1], 'h', 24);
         //解析天
-        $this->parseItem($conf_arr[0], 'd', 31);
+        $this->parseItem($conf_arr[2], 'd', 31);
         //解析月
-        $this->parseItem($conf_arr[0], 'M', 12);
+        $this->parseItem($conf_arr[3], 'M', 12);
         //解析星期
-        $this->parseItem($conf_arr[0], 'w', 6);
+        $this->parseItem($conf_arr[4], 'w', 6);
     }
 
     /**
@@ -72,9 +80,8 @@ class CrontabConfig
         //如果 带除号
         if (preg_match('#/(\d+)$#', $item_value, $split_re)) {
             $div = (int)$split_re[1];
-            $item_value = str_replace('/'. $div, '', $item_value);
+            $item_value = str_replace('/' . $div, '', $item_value);
         }
-
         //表示任意
         if ('*' === $item_value) {
             if (1 === $div) {
@@ -91,14 +98,15 @@ class CrontabConfig
 
         //如果是纯数字
         if (preg_match('#^\d+$#', $item_value)) {
-             $value = (int)$item_value;
-             if ($value > $max_value) {
-                 $this->error();
-             }
-             if (0 === $value % $div) {
-                 $this->addValue($type, $value);
-             }
-             return;
+            $value = (int)$item_value;
+            if ($value > $max_value) {
+                $this->error();
+                return;
+            }
+            if (0 === $value % $div) {
+                $this->addValue($type, $value);
+            }
+            return;
         }
 
         //如果带区间 带 区间
@@ -115,13 +123,49 @@ class CrontabConfig
     }
 
     /**
+     * 是否唤醒
+     * @return bool
+     */
+    public function isWakeUp()
+    {
+        $time_arg = explode('|', date('i|G|j|n|w'));
+        if (!$this->isMatch('m', $time_arg[0])) {
+            return false;
+        }
+        if (!$this->isMatch('h', $time_arg[1])) {
+            return false;
+        }
+        if (!$this->isMatch('d', $time_arg[2])) {
+            return false;
+        }
+        if (!$this->isMatch('M', $time_arg[3])) {
+            return false;
+        }
+        if (!$this->isMatch('w', $time_arg[4])) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 是否满足条件
+     * @param string $type
+     * @param int $value
+     * @return bool
+     */
+    private function isMatch($type, $value)
+    {
+        return isset($this->conf_arr[$type]) || isset($this->conf_arr[$type . '_' . $value]);
+    }
+
+    /**
      * 增加值
      * @param string $type
      * @param int $value
      */
     private function addValue($type, $value)
     {
-        $this->conf_arr[$type .'_'. $value] = true;
+        $this->conf_arr[$type . '_' . $value] = true;
     }
 
     /**
@@ -129,6 +173,14 @@ class CrontabConfig
      */
     private function error()
     {
-        throw new \InvalidArgumentException('Invalid crontab config:'. $this->config);
+        $this->is_valid = false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isValid()
+    {
+        return $this->is_valid;
     }
 }

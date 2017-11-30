@@ -369,16 +369,16 @@
         },
         {
             "name": "ffan/std-logger",
-            "version": "1.0.8",
+            "version": "1.0.9",
             "source": {
                 "type": "git",
                 "url": "http://gitlab.ffan.biz/php/logger.git",
-                "reference": "9a027d2251dbf80073d1bcaa39341836d01a686e"
+                "reference": "0d753ebee68a547c7a33c4b6d8f493dbee1ef666"
             },
             "dist": {
                 "type": "zip",
-                "url": "http://composer.intra.ffan.com/repo/private/dists/ffan/std-logger/1.0.8.0/9a027d2251dbf80073d1bcaa39341836d01a686e.zip",
-                "reference": "9a027d2251dbf80073d1bcaa39341836d01a686e",
+                "url": "http://composer.intra.ffan.com/repo/private/dists/ffan/std-logger/1.0.9.0/0d753ebee68a547c7a33c4b6d8f493dbee1ef666.zip",
+                "reference": "0d753ebee68a547c7a33c4b6d8f493dbee1ef666",
                 "shasum": null,
                 "mirrors": [
                     {
@@ -416,7 +416,7 @@
                 "ffan",
                 "logger"
             ],
-            "time": "2017-11-16T05:47:26+00:00"
+            "time": "2017-11-30T14:28:58+00:00"
         },
         {
             "name": "ffan/std-tpl",

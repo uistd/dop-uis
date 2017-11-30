@@ -4,6 +4,9 @@ namespace FFan\Uis\Work;
 
 use FFan\Std\Common\Config;
 use FFan\Std\Common\InvalidConfigException;
+use FFan\Std\Logger\FileLogger;
+use FFan\Std\Logger\LogHelper;
+use FFan\Std\Logger\LogRouter;
 
 /**
  * Class Manager
@@ -11,11 +14,48 @@ use FFan\Std\Common\InvalidConfigException;
  */
 class Manager
 {
-    function __construct($conf_name)
+    /**
+     * @var LogRouter
+     */
+    private $logger;
+
+    /**
+     * @var string
+     */
+    private $app_name;
+
+    /**
+     * @var Task[]
+     */
+    private $task_list = array();
+
+    /**
+     * Manager constructor.
+     * @param string $app_name
+     * @throws InvalidConfigException
+     */
+    public function __construct($app_name)
     {
-        $config_arr = Config::get('ffan-task:' . $conf_name);
-        if (!is_array($config_arr)) {
-            throw new InvalidConfigException('ffan-task:' . $conf_name);
+        $this->initLogger();
+        $this->parseMainConfig();
+    }
+
+    /**
+     * 解析主配置
+     */
+    private function parseMainConfig()
+    {
+        $work_config = Config::get('ffan-work');
+        if (!is_array($work_config)) {
+            return;
+        }
+        foreach ($work_config as $each_conf) {
+            $tmp_task = new Task($this->app_name);
+            if (!$tmp_task->parse($each_conf)) {
+                $this->logger->error($each_conf .' 无法解析');
+                continue;
+            }
+            $this->task_list[] = $tmp_task;
         }
     }
 
@@ -64,5 +104,14 @@ class Manager
         $grep_flag = self::grepFlag($file, $pid);
         $cmd = 'ps -efww | grep "' . $grep_flag . '"|grep -v grep|awk \'{ print $2 }\'|xargs --no-run-if-empty kill -' . $signal;
         exec($cmd);
+    }
+
+    /**
+     * 初始化日志
+     */
+    private function initLogger()
+    {
+        new FileLogger('crontab/'. $this->app_name, 'main', 0, FileLogger::OPT_SPLIT_BY_DAY);
+        $this->logger = LogHelper::getLogRouter();
     }
 }
