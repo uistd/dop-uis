@@ -2,7 +2,9 @@
 
 namespace FFan\Uis\Work;
 
+use FFan\Std\Common\Config;
 use FFan\Std\Common\Str;
+use FFan\Std\Logger\LogHelper;
 
 class Task
 {
@@ -27,12 +29,23 @@ class Task
     private $app_name;
 
     /**
+     * @var string php命令
+     */
+    private $php_bin;
+
+    /**
+     * @var int 进程ID
+     */
+    private $process_id = 0;
+
+    /**
      * Task constructor.
      * @param string $app_name
      */
     public function __construct($app_name)
     {
         $this->app_name = $app_name;
+        $this->php_bin = Config::get('php_bin_path', 'php');
     }
 
     /**
@@ -79,20 +92,58 @@ class Task
     }
 
     /**
-     * 获取任务类名
-     * @return string
+     * 进程是否在执行
+     * @return bool
      */
-    public function getClass()
+    public function isRunning()
     {
-        return $this->class_name;
+        if (0 === $this->process_id) {
+            return false;
+        }
+        $cmd = 'kill -0 '. $this->process_id;
+        exec($cmd, $out);
+        //没有输出, 表示进程存在
+        if (empty($out[0])) {
+            return true;
+        }
+        $this->process_id = 0;
+        return false;
     }
 
     /**
-     * 获取任务args
-     * @return string
+     * 启动进程
      */
-    public function getArgs()
+    public function start()
     {
-        return $this->args;
+        $logger = LogHelper::getLogRouter();
+        $cmd = $this->getCmd();
+        $logger->info('Start '. $cmd);
+        exec($cmd .' >> /dev/null 2>&1 &');
+        $process_cmd = 'ps -efww | grep "' . addcslashes($cmd, '"') . '"|grep -v grep|awk \'{ print $2 }\'';
+        exec($process_cmd, $out);
+        $this->process_id = isset($out[0]) ? $out[0] : 0;
+        $logger->info('done, process_id ', $this->process_id);
+    }
+
+    /**
+     * 向进程发送信息
+     * @param int $signal
+     */
+    public function kill($signal = 15)
+    {
+
+    }
+
+    /**
+     * 获取执行脚本
+     */
+    private function getCmd()
+    {
+        $cmd = $this->php_bin.' task.php '. $this->app_name .' '. $this->class_name;
+        if (!empty($this->args)) {
+            $cmd .= ' '. $this->args;
+        }
+        $cmd .= ' fin';
+        return $cmd;
     }
 }
