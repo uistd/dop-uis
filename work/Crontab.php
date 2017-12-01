@@ -31,11 +31,6 @@ class Crontab
     {
         $this->app_name = $app_name;
         $this->initLogger();
-        $process_count = Manager::processCount($this->crontabName());
-        if ($process_count > 0) {
-            $this->logMsg('exist. quit.');
-            return;
-        }
         $this->logMsg('start');
         try {
             $this->action();

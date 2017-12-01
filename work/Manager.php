@@ -3,9 +3,11 @@
 namespace FFan\Uis\Work;
 
 use FFan\Std\Common\Config;
+use FFan\Std\Common\Env;
 use FFan\Std\Common\InvalidConfigException;
 use FFan\Std\Logger\FileLogger;
 use FFan\Std\Logger\LogHelper;
+use FFan\Std\Logger\LogLevel;
 use FFan\Std\Logger\LogRouter;
 
 /**
@@ -14,6 +16,11 @@ use FFan\Std\Logger\LogRouter;
  */
 class Manager
 {
+    /**
+     * 每次循环休息时间（1秒）
+     */
+    const SLEEP_TIME = 1000000;
+
     /**
      * @var LogRouter
      */
@@ -30,6 +37,11 @@ class Manager
     private $task_list = array();
 
     /**
+     * @var bool 继续的标志
+     */
+    private $continue_flag = true;
+
+    /**
      * Manager constructor.
      * @param string $app_name
      * @throws InvalidConfigException
@@ -37,7 +49,32 @@ class Manager
     public function __construct($app_name)
     {
         $this->initLogger();
+        $this->logger->info('Task manager start!');
         $this->parseMainConfig();
+        pcntl_signal(SIGTERM, array($this, 'quitBySignal'));
+        pcntl_signal(SIGQUIT, array($this, 'quitBySignal'));
+        pcntl_signal(SIGINT, array($this, 'quitBySignal'));
+        pcntl_signal(SIGHUP, array($this, 'quitBySignal'));
+        pcntl_signal(SIGHUP, array($this, 'ignoreSignal'));
+    }
+
+    /**
+     * 监听中止进程信号
+     * @param int $signal
+     */
+    public function quitBySignal($signal)
+    {
+        $this->logger->info('Catch signal ' . $signal . ', quit.');
+        $this->continue_flag = false;
+    }
+
+    /**
+     * 忽略信号
+     * @param int $signal
+     */
+    public function ignoreSignal($signal)
+    {
+        $this->logger->info('Catch signal ' . $signal . ', ignore.');
     }
 
     /**
@@ -52,7 +89,7 @@ class Manager
         foreach ($work_config as $each_conf) {
             $tmp_task = new Task($this->app_name);
             if (!$tmp_task->parse($each_conf)) {
-                $this->logger->error($each_conf .' 无法解析');
+                $this->logger->error($each_conf . ' 无法解析');
                 continue;
             }
             $this->task_list[] = $tmp_task;
@@ -60,50 +97,46 @@ class Manager
     }
 
     /**
-     * grep的标志
-     * @param string $file
-     * @param int $pid
-     * @return string
+     * 主循环函数
      */
-    private static function grepFlag($file, $pid)
+    public function loop()
     {
-        $greg_flag = 'php ' . $file . '.php';
-        if (isset($GLOBALS['APP_NAME'])) {
-            $greg_flag .= ' ' . $GLOBALS['APP_NAME'];
+        $last_minute = 0;
+        while ($this->continue_flag) {
+            //监听信号
+            pcntl_signal_dispatch();
+            $sleep_time = self::SLEEP_TIME;
+            $start_time = microtime(true);
+            $this_minute = (int)floor(time() / 60);
+            if ($this_minute !== $last_minute) {
+                $last_minute = $this_minute;
+                $now_time = microtime(true);
+                $this->taskWakeUp();
+                $cost_time = $now_time - $start_time;
+                //转成 微秒
+                $cost_time *= 1000;
+                $sleep_time -= $cost_time;
+            }
+            //休眠时间
+            usleep($sleep_time);
         }
-        if ($pid > 0) {
-            $greg_flag .= ' ' . $pid;
-        }
-        return $greg_flag;
+        $this->logger->info('Task manager exit!');
     }
 
     /**
-     * 取得该任务在运行的进程数
-     * @param string $name 任务文件名
-     * @param int $pid 进程ID
-     * @return int
+     * 唤醒进程
      */
-    public static function processCount($name, $pid = 0)
+    private function taskWakeUp()
     {
-        $greg_flag = self::grepFlag($name, $pid);
-        $cmd = 'ps -efww | grep "' . $greg_flag . '"|grep -v grep|wc -l';
-        exec($cmd, $out);
-        $exec_num = isset($out[0]) ? $out[0] : 0;
-        return (int)$exec_num;
-    }
-
-    /**
-     * 给某个进程传递信号
-     * @param string $file 任务文件名
-     * @param int $pid 子进程ID
-     * @param int $signal 信号
-     * @return void
-     */
-    function processKill($file, $pid = -1, $signal = SIGTERM)
-    {
-        $grep_flag = self::grepFlag($file, $pid);
-        $cmd = 'ps -efww | grep "' . $grep_flag . '"|grep -v grep|awk \'{ print $2 }\'|xargs --no-run-if-empty kill -' . $signal;
-        exec($cmd);
+        foreach ($this->task_list as $task) {
+            if ($task->isRunning()) {
+                continue;
+            }
+            if (!$task->isWakeUp()) {
+                continue;
+            }
+            $task->start();
+        }
     }
 
     /**
@@ -111,7 +144,11 @@ class Manager
      */
     private function initLogger()
     {
-        new FileLogger('crontab/'. $this->app_name, 'main', 0, FileLogger::OPT_SPLIT_BY_DAY);
+        $log_level = 0xffff;
+        if (Env::isProduct()) {
+            $log_level ^= LogLevel::DEBUG;
+        }
+        new FileLogger('crontab/' . $this->app_name, 'main', $log_level, FileLogger::OPT_SPLIT_BY_DAY);
         $this->logger = LogHelper::getLogRouter();
     }
 }
