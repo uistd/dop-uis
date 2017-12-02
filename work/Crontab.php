@@ -3,7 +3,6 @@
 namespace FFan\Uis\Work;
 
 use FFan\Std\Console\Debug;
-use FFan\Std\Logger\FileLogger;
 use FFan\Std\Logger\LogHelper;
 use FFan\Std\Logger\LogRouter;
 
@@ -11,7 +10,7 @@ use FFan\Std\Logger\LogRouter;
  * Class Crontab 定时任务
  * @package FFan\Uis\Work
  */
-class Crontab
+abstract class Crontab
 {
     /**
      * @var LogRouter
@@ -30,8 +29,8 @@ class Crontab
     public function __construct($app_name)
     {
         $this->app_name = $app_name;
-        $this->initLogger();
-        $this->logMsg('start');
+        $this->logger = LogHelper::getLogRouter();
+        $this->log('start');
         try {
             $this->action();
         } catch (\Exception $exception) {
@@ -40,44 +39,23 @@ class Crontab
     }
 
     /**
-     * 初始化日志
-     */
-    private function initLogger()
-    {
-        $this->logger = LogHelper::getLogRouter();
-        $log_path = 'crontab/' . $this->app_name;
-        new FileLogger($log_path, $this->crontabName());
-    }
-
-    /**
-     * @return string
-     */
-    private function crontabName()
-    {
-        return basename(str_replace('\\', '/', static::class));
-    }
-
-    /**
      * 析构
      */
     public function __destruct()
     {
-        $this->logMsg('exit');
+        $this->log('exit');
     }
 
     /**
      * 运行
      */
-    protected function action()
-    {
-
-    }
+    abstract public function action();
 
     /**
      * 记录日志
      * @param string $msg
      */
-    protected function logMsg($msg)
+    protected function log($msg)
     {
         $this->logger->info($msg);
     }

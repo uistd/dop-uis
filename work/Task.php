@@ -8,6 +8,10 @@ use FFan\Std\Logger\LogHelper;
 
 class Task
 {
+    const GREP_TYPE_COUNT = 1;
+    const GREP_TYPE_PID = 2;
+
+
     /**
      * @var CrontabConfig
      */
@@ -34,11 +38,6 @@ class Task
     private $php_bin;
 
     /**
-     * @var int 进程ID
-     */
-    private $process_id = 0;
-
-    /**
      * Task constructor.
      * @param string $app_name
      */
@@ -56,17 +55,19 @@ class Task
     public function parse($task_config)
     {
         $tmp_arr = Str::split($task_config, ' ');
+        LogHelper::getLogRouter()->info(print_r($tmp_arr, true));
         if (count($tmp_arr) < 6) {
             return false;
         }
         //前面5项 表示 crontab
-        $crontab_str = array_shift($tmp_arr) . ' ' . array_shift($tmp_arr) . ' ' . array_shift($tmp_arr) . ' ' . array_shift($tmp_arr) . array_shift($tmp_arr);
+        $crontab_str = array_shift($tmp_arr) . ' ' . array_shift($tmp_arr) . ' ' . array_shift($tmp_arr) . ' ' . array_shift($tmp_arr) . ' ' . array_shift($tmp_arr);
         $crontab_config = new CrontabConfig($crontab_str);
         if (!$crontab_config->isValid()) {
             return false;
         }
         //类名
-        $class_name = str_replace('.php', ' ', array_shift($tmp_arr));
+        $class_name = str_replace('.php', '', array_shift($tmp_arr));
+        LogHelper::getLogRouter()->info($class_name);
         //是否是合法的类名
         if (!Str::isValidClassName($class_name)) {
             return false;
@@ -97,17 +98,8 @@ class Task
      */
     public function isRunning()
     {
-        if (0 === $this->process_id) {
-            return false;
-        }
-        $cmd = 'kill -0 '. $this->process_id;
-        exec($cmd, $out);
-        //没有输出, 表示进程存在
-        if (empty($out[0])) {
-            return true;
-        }
-        $this->process_id = 0;
-        return false;
+        $result = $this->grep();
+        return !empty($result);
     }
 
     /**
@@ -115,14 +107,9 @@ class Task
      */
     public function start()
     {
-        $logger = LogHelper::getLogRouter();
         $cmd = $this->getCmd();
-        $logger->info('Start '. $cmd);
-        exec($cmd .' >> /dev/null 2>&1 &');
-        $process_cmd = 'ps -efww | grep "' . addcslashes($cmd, '"') . '"|grep -v grep|awk \'{ print $2 }\'';
-        exec($process_cmd, $out);
-        $this->process_id = isset($out[0]) ? $out[0] : 0;
-        $logger->info('done, process_id ', $this->process_id);
+        $this->log('Start ' . $cmd);
+        exec($cmd . ' >> /dev/null 2>&1 &');
     }
 
     /**
@@ -131,19 +118,54 @@ class Task
      */
     public function kill($signal = 15)
     {
-
+        $process_id = $this->grep(self::GREP_TYPE_PID);
+        if (empty($process_id)) {
+            $this->log('Process not exist!');
+            return;
+        }
+        $cmd = 'kill -' . $signal . ' ' . $process_id;
+        $this->log('execute '. $cmd);
+        exec($cmd);
     }
 
     /**
      * 获取执行脚本
+     * @return string
      */
     private function getCmd()
     {
-        $cmd = $this->php_bin.' task.php '. $this->app_name .' '. $this->class_name;
+        $cmd = $this->php_bin . ' task.php ' . $this->app_name . ' ' . $this->class_name . '.php';
         if (!empty($this->args)) {
-            $cmd .= ' '. $this->args;
+            $cmd .= ' ' . $this->args;
         }
-        $cmd .= ' fin';
         return $cmd;
+    }
+
+    /**
+     * 获取grep执行结果
+     * @param int $type
+     * @return string
+     */
+    private function grep($type = self::GREP_TYPE_COUNT)
+    {
+        $cmd = $this->getCmd();
+        $grep_cmd = 'ps -efww | grep "' . addcslashes($cmd, '"') . '"|grep -v grep|';
+        if (self::GREP_TYPE_COUNT === $type) {
+            $grep_cmd .= 'wc -l';
+        } else {
+            $grep_cmd .= 'awk \'{ print $2 }\'';
+        }
+        exec($grep_cmd, $out);
+        return (isset($out[0])) ? $out[0] : '';
+    }
+
+    /**
+     * 日志消息
+     * @param string $msg
+     */
+    private function log($msg)
+    {
+        $logger = LogHelper::getLogRouter();
+        $logger->info($msg);
     }
 }

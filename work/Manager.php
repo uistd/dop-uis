@@ -3,11 +3,8 @@
 namespace FFan\Uis\Work;
 
 use FFan\Std\Common\Config;
-use FFan\Std\Common\Env;
 use FFan\Std\Common\InvalidConfigException;
-use FFan\Std\Logger\FileLogger;
 use FFan\Std\Logger\LogHelper;
-use FFan\Std\Logger\LogLevel;
 use FFan\Std\Logger\LogRouter;
 
 /**
@@ -48,7 +45,8 @@ class Manager
      */
     public function __construct($app_name)
     {
-        $this->initLogger();
+        $this->app_name = $app_name;
+        $this->logger = LogHelper::getLogRouter();
         $this->logger->info('Task manager start!');
         $this->parseMainConfig();
         pcntl_signal(SIGTERM, array($this, 'quitBySignal'));
@@ -137,18 +135,5 @@ class Manager
             }
             $task->start();
         }
-    }
-
-    /**
-     * 初始化日志
-     */
-    private function initLogger()
-    {
-        $log_level = 0xffff;
-        if (Env::isProduct()) {
-            $log_level ^= LogLevel::DEBUG;
-        }
-        new FileLogger('crontab/' . $this->app_name, 'main', $log_level, FileLogger::OPT_SPLIT_BY_DAY);
-        $this->logger = LogHelper::getLogRouter();
     }
 }
