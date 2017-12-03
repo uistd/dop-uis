@@ -11,7 +11,6 @@ class Task
     const GREP_TYPE_COUNT = 1;
     const GREP_TYPE_PID = 2;
 
-
     /**
      * @var CrontabConfig
      */

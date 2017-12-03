@@ -53,7 +53,6 @@ class Manager
         pcntl_signal(SIGQUIT, array($this, 'quitBySignal'));
         pcntl_signal(SIGINT, array($this, 'quitBySignal'));
         pcntl_signal(SIGHUP, array($this, 'quitBySignal'));
-        pcntl_signal(SIGHUP, array($this, 'ignoreSignal'));
     }
 
     /**
@@ -119,6 +118,17 @@ class Manager
             usleep($sleep_time);
         }
         $this->logger->info('Task manager exit!');
+        $this->killAllTask();
+    }
+
+    /**
+     * 终止所有其它进程
+     */
+    private function killAllTask()
+    {
+        foreach ($this->task_list as $task) {
+            $task->kill(SIGINT);
+        }
     }
 
     /**
