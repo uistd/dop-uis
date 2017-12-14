@@ -52,12 +52,13 @@ class FFan
         if ('/' !== $log_path{$log_path_len - 1}) {
             $log_path .= '/';
         }
+        $log_path .= $app_name;
         //开发环境将所有日志，写到一个文件
         if ($env === Env::DEV) {
-            $file_name = $log_path . $app_name . '/' . $app_name;
+            $file_name = $log_path . '/' . $app_name;
         } //其它 环境，每个page一个目录，一个action 一个文件
         else {
-            $file_name = $log_path . $server_info->getPageName() . '/' . $server_info->getActionName();
+            $file_name = $log_path . '/' . $server_info->getPageName() . '/' . $server_info->getActionName();
         }
         //默认打开全部的日志级别
         $log_level = 0xffff;
