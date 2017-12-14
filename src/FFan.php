@@ -4,12 +4,12 @@ namespace FFan\Dop\Uis;
 
 use FFan\Std\Common\Config;
 use FFan\Std\Common\Env;
-use FFan\Std\Common\Utils;
 use FFan\Std\Console\Debug;
 use FFan\Std\Logger\FileLogger;
 use FFan\Std\Logger\LogHelper;
 use FFan\Std\Logger\LogLevel;
 use FFan\Std\Logger\LogRouter;
+use FFan\Std\Logger\UisLogger;
 
 /**
  * Class FFan 基础类
@@ -42,29 +42,44 @@ class FFan
     {
         $server_info = ServerHandler::getInstance();
         $app_name = $server_info->getAppName();
-        $config_path = Config::getString('log_path', 'logs');
-        $app_log_path = Utils::fixWithRuntimePath($config_path) . $app_name . '/';
+        $log_config = Config::get('logger');
+        if (!is_array($log_config)) {
+            $log_config = array('path' => 'logs', 'type' => 'file');
+        }
         $env = Env::getEnv();
+        $log_path = isset($log_config['path']) ? $log_config['path'] : 'logs';
+        $log_path_len = strlen($log_path);
+        if ('/' !== $log_path{$log_path_len - 1}) {
+            $log_path .= '/';
+        }
         //开发环境将所有日志，写到一个文件
         if ($env === Env::DEV) {
-            $file_name = $app_name;
-            $log_path = $app_log_path;
+            $file_name = $log_path . $app_name . '/' . $app_name;
         } //其它 环境，每个page一个目录，一个action 一个文件
         else {
-            $log_path = $app_log_path . $server_info->getPageName() . '/';
-            $file_name = $server_info->getActionName();
+            $file_name = $log_path . $server_info->getPageName() . '/' . $server_info->getActionName();
         }
         //默认打开全部的日志级别
         $log_level = 0xffff;
         if ($env === Env::PRODUCT || $env === Env::UAT) {
             $log_level ^= LogLevel::DEBUG;
         }
-        $main_logger = new FileLogger($log_path, $file_name, $log_level);
+        $err_log = $log_path . $app_name . '/error';
+        $err_level = LogLevel::ERROR | LogLevel::EMERGENCY | LogLevel::ALERT | LogLevel::CRITICAL;
+        //日志放远程服务器
+        if (isset($log_config['host'])) {
+            $main_logger = new UisLogger($file_name, $log_level, 0, $log_config);
+            //错误日志
+            new UisLogger($err_log, $err_level, 0, $log_config);
+        } else {
+            $main_logger = new FileLogger($file_name, $log_level);
+            //错误日志
+            new FileLogger($err_log, $err_level);
+        }
         //生产环境，每一次请求一行日志
         if ($env === Env::PRODUCT) {
             $main_logger->setOption(FileLogger::OPT_BREAK_EACH_REQUEST);
         }
-        new FileLogger($app_log_path, 'error', LogLevel::ERROR | LogLevel::EMERGENCY | LogLevel::ALERT | LogLevel::CRITICAL);
     }
 
     /**
