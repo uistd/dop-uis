@@ -20,12 +20,12 @@ class ActivityManager
     /**
      * @var Activity[]
      */
-    private $activity_list;
+    private $instance_list;
 
     /**
-     * @var array 配置
+     * @var array 生效活动配置
      */
-    private $activity_conf;
+    private $active_list;
 
     /**
      * @var bool 是否初化完成
@@ -49,44 +49,36 @@ class ActivityManager
     }
 
     /**
-     * 获取总配置
+     * 获取所有在活动期间的活动
      * @return array
      */
-    private function getConfig()
+    private function getActiveList()
     {
-        if (null !== $this->activity_conf) {
-            return $this->activity_conf;
+        if (null !== $this->active_list) {
+            return $this->active_list;
         }
-        $config_arr = Config::get('uis-activity');
-        if (!is_array($config_arr)) {
-            $config_arr = array();
-        }
-        $new_conf = array();
+        $config_file = ROOT_PATH .'config/activity_config.php';
+        $config_arr = Config::load($config_file);
+        $this->instance_list = array();
         $now = time();
         foreach ($config_arr as $name => $each_conf) {
-            $start_time = 0;
-            $end_time = 0;
-            $is_active = true;
-            //如果指定了开始时间
-            if (isset($each_conf['start_time'])) {
-                $start_time = strtotime($each_conf['start_time']);
+            $tmp_conf = Str::split($each_conf, ',');
+            //配置格式不对
+            if (!isset($tmp_conf[0], $tmp_conf[1])) {
+                continue;
             }
-            if (isset($each_conf['end_time'])) {
-                $end_time = strtotime($each_conf['end_time']);
-            }
-            $each_conf['start_time'] = $start_time;
-            $each_conf['end_time'] = $end_time;
+            //判断是否在活动时间里
+            $start_time = strtotime($tmp_conf[0]);
+            $end_time = strtotime($tmp_conf[1]);
             if ($now < $start_time) {
-                $is_active = false;
+                continue;
             }
             if ($end_time > 0 && $now > $end_time) {
-                $is_active = false;
+                continue;
             }
-            $each_conf['_IS_ACTIVE_'] = $is_active;
-            $new_conf[Str::camelName($name)] = $each_conf;
+            $this->instance_list[$name] = true;
         }
-        $this->activity_conf = $new_conf;
-        return $this->activity_conf;
+        return $this->active_list;
     }
 
     /**
@@ -98,20 +90,14 @@ class ActivityManager
             return;
         }
         $this->is_init = true;
-        $config_arr = $this->getConfig();
-        foreach ($config_arr as $name => $each_conf) {
-            $u_name = Str::camelName($name);
+        $active_list = $this->getActiveList();
+        foreach ($active_list as $class_name => $conf_name) {
             //已经初始化过了
-            if (isset($this->activity_list[$u_name])) {
+            if (isset($this->instance_list[$class_name])) {
                 continue;
             }
-            //不在活动时间
-            if (!$each_conf['_IS_ACTIVE_']) {
-                continue;
-            }
-            $this->getActiveInstance($name);
+            $this->getActiveInstance($class_name);
         }
-        $this->activity_conf = $config_arr;
     }
 
     /**
@@ -157,11 +143,10 @@ class ActivityManager
      */
     public function getActiveInstance($name)
     {
-        $u_name = Str::camelName($name);
-        if (!isset($this->activity_list[$u_name])) {
+        if (!isset($this->instance_list[$name])) {
             $this->initActiveInstance($name);
         }
-        return isset($this->activity_list[$u_name]) ? $this->activity_list[$u_name] : null;
+        return isset($this->instance_list[$name]) ? $this->instance_list[$name] : null;
     }
 
     /**
@@ -171,25 +156,21 @@ class ActivityManager
      */
     private function initActiveInstance($name)
     {
-        $config_arr = $this->getConfig();
-        $u_name = Str::camelName($name);
-        if (!is_array($config_arr[$u_name])) {
-            $config_arr[$u_name] = array();
-        }
         $app_name = Str::camelName(Application::getInstance()->getAppName());
-        $each_conf = $config_arr[$u_name];
-        $class_name = '\\Uis\\' . $app_name . '\\Activity\\' . $u_name.'Activity';
+        $class_name = '\\Uis\\' . $app_name . '\\Activity\\' . $name . 'Activity';
         if (!class_exists($class_name)) {
             throw new InvalidConfigException('uis-activity:' . $name . ' class not found');
         }
+        $conf_file = ROOT_PATH .'config/activity/'. $name .'Config.php';
+        $conf_arr = Config::load($conf_file);
         /** @var Activity $active */
-        $active = new $class_name($name, $each_conf);
+        $active = new $class_name($name, $conf_arr);
         //如果 活动在生效中
-        if ($this->isActive($u_name)) {
+        if ($this->isActive($name)) {
             //事件监听
             $active->attach();
         }
-        $this->activity_list[$u_name] = $active;
+        $this->instance_list[$name] = $active;
     }
 
     /**
@@ -199,12 +180,8 @@ class ActivityManager
      */
     public function isActive($name)
     {
-        $config = $this->getConfig();
-        $name = Str::camelName($name);
-        if (!isset($config[$name])) {
-            return false;
-        }
-        return $config[$name]['_IS_ACTIVE_'];
+        $list = $this->getActiveList();
+        return isset($list[$name]);
     }
 
     /**

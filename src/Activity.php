@@ -42,7 +42,8 @@ abstract class Activity extends ConfigBase
         if (false !== $pos) {
             $class = substr($class, $pos + 1);
         }
-        $class = substr($class, 0, -8);
+        //移除类名后缀
+        $class = str_replace('Activity','', $class);
         return ActivityManager::getInstance()->getActiveInstance($class);
     }
 
@@ -51,6 +52,6 @@ abstract class Activity extends ConfigBase
      */
     public function isActive()
     {
-        return $this->getConfigBool('_IS_ACTIVE_');
+        return ActivityManager::getInstance()->isActive($this->name);
     }
 }
