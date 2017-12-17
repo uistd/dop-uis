@@ -65,7 +65,7 @@ class FFan
         if ($env === Env::PRODUCT || $env === Env::UAT) {
             $log_level ^= LogLevel::DEBUG;
         }
-        $err_log = $log_path . $app_name . '/error';
+        $err_log = $log_path . '/error';
         $err_level = LogLevel::ERROR | LogLevel::EMERGENCY | LogLevel::ALERT | LogLevel::CRITICAL;
         //日志放远程服务器
         if (isset($log_config['host'])) {
