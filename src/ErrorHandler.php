@@ -1,14 +1,14 @@
 <?php
 
-namespace FFan\Dop\Uis;
+namespace UiStd\Uis\Base;
 
-use FFan\Std\Console\Debug;
-use FFan\Std\Common\Env;
-use FFan\Std\Event\EventManager;
+use UiStd\Console\Debug;
+use UiStd\Common\Env;
+use UiStd\Event\EventManager;
 
 /**
  * Class ErrorHandle
- * @package FFan\Dop\Uis
+ * @package UiStd\Uis\Base
  */
 class ErrorHandler
 {

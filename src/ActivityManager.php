@@ -1,14 +1,14 @@
 <?php
 
-namespace FFan\Dop\Uis;
+namespace UiStd\Uis\Base;
 
-use FFan\Std\Common\Config;
-use FFan\Std\Common\InvalidConfigException;
-use FFan\Std\Common\Str;
+use UiStd\Common\Config;
+use UiStd\Common\InvalidConfigException;
+use UiStd\Common\Str;
 
 /**
  * Class ActivityManager 活动管理器
- * @package FFan\Dop\Uis
+ * @package UiStd\Uis\Base
  */
 class ActivityManager
 {

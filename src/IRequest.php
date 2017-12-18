@@ -1,10 +1,10 @@
 <?php
 
-namespace FFan\Dop\Uis;
+namespace UiStd\Uis\Base;
 
 /**
  * Interface DopRequest
- * @package FFan\Dop\Uis
+ * @package UiStd\Uis\Base
  */
 interface IRequest
 {

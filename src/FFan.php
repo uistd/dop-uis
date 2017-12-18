@@ -1,19 +1,19 @@
 <?php
 
-namespace FFan\Dop\Uis;
+namespace UiStd\Uis\Base;
 
-use FFan\Std\Common\Config;
-use FFan\Std\Common\Env;
-use FFan\Std\Console\Debug;
-use FFan\Std\Logger\FileLogger;
-use FFan\Std\Logger\LogHelper;
-use FFan\Std\Logger\LogLevel;
-use FFan\Std\Logger\LogRouter;
-use FFan\Std\Logger\UisLogger;
+use UiStd\Common\Config;
+use UiStd\Common\Env;
+use UiStd\Console\Debug;
+use UiStd\Logger\FileLogger;
+use UiStd\Logger\LogHelper;
+use UiStd\Logger\LogLevel;
+use UiStd\Logger\LogRouter;
+use UiStd\Logger\UisLogger;
 
 /**
- * Class FFan 基础类
- * @package FFan\Dop\Uis
+ * Class 基础类
+ * @package UiStd\Uis\Base
  */
 class FFan
 {

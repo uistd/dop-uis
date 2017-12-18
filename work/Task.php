@@ -1,10 +1,10 @@
 <?php
 
-namespace FFan\Uis\Work;
+namespace UiStd\Uis\Work;
 
-use FFan\Std\Common\Config;
-use FFan\Std\Common\Str;
-use FFan\Std\Logger\LogHelper;
+use UiStd\Common\Config;
+use UiStd\Common\Str;
+use UiStd\Logger\LogHelper;
 
 class Task
 {

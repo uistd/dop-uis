@@ -1,18 +1,18 @@
 <?php
 
-namespace FFan\Dop\Uis;
+namespace UiStd\Uis\Base;
 
-use FFan\Std\Common\Config as FFanConfig;
-use FFan\Std\Common\Env as FFanEnv;
-use FFan\Std\Common\Ip;
-use FFan\Std\Common\Str as FFanStr;
-use FFan\Std\Console\Debug;
-use FFan\Std\Event\EventDriver;
-use FFan\Std\Event\EventManager;
+use UiStd\Common\Config as UisConfig;
+use UiStd\Common\Env as UisEnv;
+use UiStd\Common\Ip;
+use UiStd\Common\Str as UisStr;
+use UiStd\Console\Debug;
+use UiStd\Event\EventDriver;
+use UiStd\Event\EventManager;
 
 /**
  * Class Application
- * @package FFan\Dop\Uis
+ * @package UiStd\Uis\Base
  */
 class Application
 {
@@ -65,7 +65,7 @@ class Application
         if (null !== self::$instance) {
             throw new \RuntimeException('Application is a singleton class');
         }
-        FFanConfig::init($config);
+        UisConfig::init($config);
         FFan::getLogger();
         $this->init();
         $this->server_info = ServerHandler::getInstance();
@@ -122,9 +122,9 @@ class Application
      */
     private function init()
     {
-        $charset = FFanEnv::getCharset();
+        $charset = UisEnv::getCharset();
         ini_set('default_charset', $charset);
-        $timezone = FFanEnv::getTimezone();
+        $timezone = UisEnv::getTimezone();
         date_default_timezone_set($timezone);
         $this->error_handler = new ErrorHandler($this);
         $this->error_handler->register();
@@ -137,7 +137,7 @@ class Application
     {
         $page_name = $this->server_info->getPageName();
         $action_name = $this->server_info->getActionName();
-        $u_page_name = FFanStr::camelName($page_name);
+        $u_page_name = UisStr::camelName($page_name);
         $class_name = $u_page_name . 'Page';
         $ns = $this->getAppNameSpace() . '\\Page\\';
         $class_name = $ns . $class_name;
@@ -178,13 +178,13 @@ class Application
     private function mockAction()
     {
         $page_name = $this->server_info->getPageName();
-        $u_page_name = FFanStr::camelName($page_name);
+        $u_page_name = UisStr::camelName($page_name);
         $action_name = $this->server_info->getActionName();
         $this->getActionArgs($u_page_name, $action_name);
         if (Response::STATUS_OK !== $this->response->getStatus()) {
             return;
         }
-        $u_app_name = FFanStr::camelName($this->app_name);
+        $u_app_name = UisStr::camelName($this->app_name);
         $mock_class = '\\Protocol\\PluginMock\\' . $u_app_name . '\\Mock' . $u_app_name . $u_page_name;
         if (!class_exists($mock_class)) {
             $this->response->setStatus(Response::STATUS_PAGE_NOT_FOUND, 'Mock class ' . $mock_class . ' not found');
@@ -224,7 +224,7 @@ class Application
     private function getActionArgs($page_name, $action_name)
     {
         $class_name = $action_name . 'Request';
-        $dop_class = '\\Protocol\\' . FFanStr::camelName($this->app_name) . '\\' . $page_name . '\\' . $class_name;
+        $dop_class = '\\Protocol\\' . UisStr::camelName($this->app_name) . '\\' . $page_name . '\\' . $class_name;
         $action_args = null;
         if (!class_exists($dop_class)) {
             return null;
@@ -267,7 +267,7 @@ class Application
     private function getAppNameSpace()
     {
         if (null === $this->app_ns) {
-            $u_app_name = FFanStr::camelName($this->app_name);
+            $u_app_name = UisStr::camelName($this->app_name);
             $this->app_ns = 'Uis\\' . $u_app_name;
         }
         return $this->app_ns;
@@ -340,7 +340,7 @@ class Application
         }
         $sub_name = substr($class_name, strlen($main_ns) + 1);
         $path_name = str_replace('\\', '/', $sub_name);
-        $file = FFanEnv::getRootPath() . 'apps/' . $this->app_name . '/' . $path_name . '.php';
+        $file = UisEnv::getRootPath() . 'apps/' . $this->app_name . '/' . $path_name . '.php';
         if (!is_file($file)) {
             return;
         }
@@ -357,8 +357,8 @@ class Application
         if ('mock' === $tool) {
             $this->mockAction();
         } else {
-            $tool_class_name = FFanStr::camelName($tool) . 'Tool';
-            $file = FFanEnv::getRootPath() . 'tool/class/' . $tool_class_name . '.php';
+            $tool_class_name = UisStr::camelName($tool) . 'Tool';
+            $file = UisEnv::getRootPath() . 'tool/class/' . $tool_class_name . '.php';
             if (is_file($file)) {
                 $full_class = '\\Uis\Tool\\' . $tool_class_name;
                 /** @noinspection PhpIncludeInspection */

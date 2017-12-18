@@ -1,12 +1,12 @@
 <?php
 
-namespace FFan\Uis\Work;
+namespace UiStd\Uis\Work;
 
-use FFan\Std\Common\Str;
+use UiStd\Common\Str;
 
 /**
  * Class CrontabConfig
- * @package FFan\Uis\Work
+ * @package UiStd\Uis\Work
  */
 class CrontabConfig
 {

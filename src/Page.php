@@ -1,11 +1,11 @@
 <?php
 
-namespace FFan\Dop\Uis;
-use FFan\Std\Http\ApiResult;
+namespace UiStd\Uis\Base;
+use UiStd\Http\ApiResult;
 
 /**
  * Class Page
- * @package FFan\Dop\Uis
+ * @package UiStd\Uis\Base
  */
 class Page
 {

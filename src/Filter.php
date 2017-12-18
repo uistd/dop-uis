@@ -1,10 +1,10 @@
 <?php
 
-namespace FFan\Dop\Uis;
+namespace UiStd\Uis\Base;
 
 /**
  * Class Filter 过滤器
- * @package FFan\Dop\Uis
+ * @package UiStd\Uis\Base
  */
 abstract class Filter
 {

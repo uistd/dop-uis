@@ -1,15 +1,15 @@
 <?php
 
-namespace FFan\Dop\Uis;
+namespace UiStd\Uis\Base;
 
-use FFan\Std\Common\Config;
-use FFan\Std\Common\Env as FFanEnv;
-use FFan\Std\Console\Debug;
-use FFan\Std\Tpl\Tpl;
+use UiStd\Common\Config;
+use UiStd\Common\Env as UisEnv;
+use UiStd\Console\Debug;
+use UiStd\Tpl\Tpl;
 
 /**
  * Class View 显示类
- * @package FFan\Dop\Uis
+ * @package UiStd\Uis\Base
  */
 class View
 {
@@ -71,7 +71,7 @@ class View
         }
         $app = Application::getInstance();
         //设置tpl的路径
-        Config::add('ffan-tpl', array('tpl_dir' => 'apps/' . $app->getAppName() . '/view'));
+        Config::add('uis-tpl', array('tpl_dir' => 'apps/' . $app->getAppName() . '/view'));
         if (!Tpl::hasTpl($tpl_name, $tpl_file)) {
             throw new ActionException("Tpl '" . $tpl_file . "' not found", '105');
         }
@@ -144,7 +144,7 @@ class View
     private function clearOutputBuffer()
     {
         //如果是开发模式，将输出以日志形式记录
-        if (FFanEnv::isDev()) {
+        if (UisEnv::isDev()) {
             for ($level = ob_get_level(); $level > 0; --$level) {
                 $tmp = ob_get_clean();
                 if (false !== $tmp && strlen($tmp) > 0) {

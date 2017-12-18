@@ -1,11 +1,11 @@
 <?php
-namespace FFan\Dop\Uis;
+namespace UiStd\Uis\Base;
 
-use FFan\Std\Common\Str as FFanStr;
+use UiStd\Common\Str as UisStr;
 
 /**
  * Class ServerHandler
- * @package FFan\Dop\Uis
+ * @package UiStd\Uis\Base
  */
 class ServerHandler
 {
@@ -60,7 +60,7 @@ class ServerHandler
             $this->page_name = $page_name;
             return;
         }
-        $path_arr = FFanStr::split($route_path, '/');
+        $path_arr = UisStr::split($route_path, '/');
         $count = count($path_arr);
         //如果只有1级，route_path就表示 app_name
         if (1 === $count) {
@@ -84,7 +84,7 @@ class ServerHandler
         }
         $this->app_name = $app_name;
         $this->page_name = $page_name;
-        $this->action_name = FFanStr::camelName($action_name);
+        $this->action_name = UisStr::camelName($action_name);
         FFan::debug('App:'. $app_name . ' Page:'. $this->page_name . ' Action:'. $this->action_name);
     }
 

@@ -1,10 +1,10 @@
 <?php
 
-namespace FFan\Dop\Uis;
+namespace UiStd\Uis\Base;
 
 /**
  * Interface IResponse
- * @package FFan\Dop\Uis
+ * @package UiStd\Uis\Base
  */
 interface IResponse
 {

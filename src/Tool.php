@@ -1,13 +1,13 @@
 <?php
 
-namespace FFan\Dop\Uis;
+namespace UiStd\Uis\Base;
 
-use FFan\Std\Common\Config;
-use FFan\Std\Tpl\Tpl;
+use UiStd\Common\Config;
+use UiStd\Tpl\Tpl;
 
 /**
  * Class Tool
- * @package FFan\Dop\Uis
+ * @package UiStd\Uis\Base
  */
 abstract class Tool
 {

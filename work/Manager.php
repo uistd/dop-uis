@@ -1,15 +1,15 @@
 <?php
 
-namespace FFan\Uis\Work;
+namespace UiStd\Uis\Work;
 
-use FFan\Std\Common\Config;
-use FFan\Std\Common\InvalidConfigException;
-use FFan\Std\Logger\LogHelper;
-use FFan\Std\Logger\LogRouter;
+use UiStd\Common\Config;
+use UiStd\Common\InvalidConfigException;
+use UiStd\Logger\LogHelper;
+use UiStd\Logger\LogRouter;
 
 /**
  * Class Manager
- * @package FFan\Uis\Work
+ * @package UiStd\Uis\Work
  */
 class Manager
 {
@@ -79,7 +79,7 @@ class Manager
      */
     private function parseMainConfig()
     {
-        $work_config = Config::get('ffan-work');
+        $work_config = Config::get('uis-work');
         if (!is_array($work_config)) {
             return;
         }

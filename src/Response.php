@@ -1,13 +1,13 @@
 <?php
 
-namespace FFan\Dop\Uis;
+namespace UiStd\Uis\Base;
 
-use FFan\Std\Common\Config;
-use FFan\Std\Common\Str;
+use UiStd\Common\Config;
+use UiStd\Common\Str;
 
 /**
  * Class Response
- * @package ffan\php\base
+ * @package UiStd\Uis\Base
  */
 class Response
 {

@@ -1,12 +1,12 @@
 <?php
 
-namespace FFan\Dop\Uis;
+namespace UiStd\Uis\Base;
 
-use FFan\Std\Common\ConfigBase;
+use UiStd\Common\ConfigBase;
 
 /**
  * Class Activity
- * @package FFan\Dop\Uis
+ * @package UiStd\Uis\Base
  */
 abstract class Activity extends ConfigBase
 {

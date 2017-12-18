@@ -1,10 +1,10 @@
 <?php
 
-namespace FFan\Dop\Uis;
+namespace UiStd\Uis\Base;
 
 /**
  * Class Result
- * @package FFan\Dop\Uis
+ * @package UiStd\Uis\Base
  */
 class Result implements IResponse
 {

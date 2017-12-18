@@ -1,6 +1,6 @@
 <?php
 
-use FFan\Uis\Work\CrontabConfig;
+use UiStd\Uis\Work\CrontabConfig;
 
 require_once '../vendor/autoload.php';
 

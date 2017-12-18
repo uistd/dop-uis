@@ -1,14 +1,14 @@
 <?php
 
-namespace FFan\Uis\Work;
+namespace UiStd\Uis\Work;
 
-use FFan\Std\Console\Debug;
-use FFan\Std\Logger\LogHelper;
-use FFan\Std\Logger\LogRouter;
+use UiStd\Console\Debug;
+use UiStd\Logger\LogHelper;
+use UiStd\Logger\LogRouter;
 
 /**
  * Class Crontab 定时任务
- * @package FFan\Uis\Work
+ * @package UiStd\Uis\Work
  */
 abstract class Crontab
 {
