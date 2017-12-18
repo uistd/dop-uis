@@ -85,7 +85,7 @@ class ServerHandler
         $this->app_name = $app_name;
         $this->page_name = $page_name;
         $this->action_name = UisStr::camelName($action_name);
-        FFan::debug('App:'. $app_name . ' Page:'. $this->page_name . ' Action:'. $this->action_name);
+        Uis::debug('App:'. $app_name . ' Page:'. $this->page_name . ' Action:'. $this->action_name);
     }
 
     /**

@@ -122,7 +122,7 @@ class ErrorHandler
         if (!isset($error['type']) || !isset(self::$fatal_error_map[$error['type']])) {
             return;
         }
-        FFan::getLogger()->emergency('PHP FATAL ERROR');
+        Uis::getLogger()->emergency('PHP FATAL ERROR');
         $this->handleError($error['type'], $error['message'], $error['file'], $error['line']);
         $this->displayException('Fatal error handler');
     }

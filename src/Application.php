@@ -66,7 +66,7 @@ class Application
             throw new \RuntimeException('Application is a singleton class');
         }
         UisConfig::init($config);
-        FFan::getLogger();
+        Uis::getLogger();
         $this->init();
         $this->server_info = ServerHandler::getInstance();
         spl_autoload_register([$this, 'autoLoader']);

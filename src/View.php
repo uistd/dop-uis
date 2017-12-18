@@ -148,7 +148,7 @@ class View
             for ($level = ob_get_level(); $level > 0; --$level) {
                 $tmp = ob_get_clean();
                 if (false !== $tmp && strlen($tmp) > 0) {
-                    FFan::debug($tmp);
+                    Uis::debug($tmp);
                 }
             }
         }//正式环境将之前的所有输出全部clean

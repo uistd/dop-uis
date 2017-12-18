@@ -15,7 +15,7 @@ use UiStd\Logger\UisLogger;
  * Class 基础类
  * @package UiStd\Uis\Base
  */
-class FFan
+class Uis
 {
     /**
      * @var bool 日志对象
