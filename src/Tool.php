@@ -28,7 +28,7 @@ abstract class Tool
     public function __construct(Application $app)
     {
         $this->app = $app;
-        Config::add('ffan-tpl', array(
+        Config::add('uis-tpl', array(
             'tpl_dir' => 'tool/views'
         ));
         header('Access-Control-Allow-Origin:*');
