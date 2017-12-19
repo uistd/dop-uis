@@ -59,7 +59,7 @@ class ActivityManager
         }
         $config_file = ROOT_PATH .'config/activity_config.php';
         $config_arr = Config::load($config_file);
-        $this->instance_list = array();
+        $this->active_list = array();
         $now = time();
         foreach ($config_arr as $name => $each_conf) {
             $tmp_conf = Str::split($each_conf, ',');
@@ -76,7 +76,7 @@ class ActivityManager
             if ($end_time > 0 && $now > $end_time) {
                 continue;
             }
-            $this->instance_list[$name] = true;
+            $this->active_list[$name] = true;
         }
         return $this->active_list;
     }
