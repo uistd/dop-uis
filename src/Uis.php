@@ -42,7 +42,7 @@ class Uis
     {
         $server_info = ServerHandler::getInstance();
         $app_name = $server_info->getAppName();
-        $log_config = Config::get('logger');
+        $log_config = Config::get('uis-logger');
         if (!is_array($log_config)) {
             $log_config = array('path' => 'logs', 'type' => 'file');
         }
