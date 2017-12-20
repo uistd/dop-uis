@@ -139,7 +139,7 @@ class Application
         $action_name = $this->server_info->getActionName();
         $u_page_name = UisStr::camelName($page_name);
         $class_name = $u_page_name . 'Page';
-        $ns = 'Uis\Page\\' . $this->camel_app_name .'\\';
+        $ns = 'Uis\Page\\' . $this->camel_app_name . '\\';
         $class_name = $ns . $class_name;
         if (!class_exists($class_name)) {
             $this->response->setStatus(Response::STATUS_PAGE_NOT_FOUND);
@@ -170,47 +170,6 @@ class Application
             return;
         }
         call_user_func(array($page_obj, $call_func), $action_args);
-    }
-
-    /**
-     * mock方法
-     */
-    private function mockAction()
-    {
-        $page_name = $this->server_info->getPageName();
-        $u_page_name = UisStr::camelName($page_name);
-        $action_name = $this->server_info->getActionName();
-        $this->getActionArgs($u_page_name, $action_name);
-        if (Response::STATUS_OK !== $this->response->getStatus()) {
-            return;
-        }
-        $ns = '\Uis\Protocol\PluginMock\\' . $this->camel_app_name;
-        $mock_class = $ns . '\Mock' . $this->camel_app_name . $u_page_name;
-        if (!class_exists($mock_class)) {
-            $this->response->setStatus(Response::STATUS_PAGE_NOT_FOUND, 'Mock class ' . $mock_class . ' not found');
-            return;
-        }
-        $method = 'mock' . $action_name . 'Response';
-        $ref = new \ReflectionClass($mock_class);
-        if (!$ref->hasMethod($method)) {
-            $this->response->setStatus(Response::STATUS_PAGE_NOT_FOUND, 'Mock action ' . $mock_class . '::' . $method . ' not found');
-            return;
-        }
-        /** @var Result $data */
-        $data = call_user_func(array($mock_class, $method));
-        $data->status = 0;
-        $data->message = 'MOCK DATA';
-        $this->response->setResult($data);
-
-        //如果 存在mock方法，将mock出来的对象 调用 mock 方法 二次加工
-        $class_name = 'Uis\Protocol\PluginMock\\' . $u_page_name . 'Mock';
-        if (class_exists($class_name)) {
-            $mock_obj = new $class_name();
-            $call_func = 'mock' . $action_name;
-            if (method_exists($mock_obj, $call_func)) {
-                call_user_func([$mock_obj, $call_func], $data);
-            }
-        }
     }
 
     /**
@@ -313,36 +272,30 @@ class Application
     }
 
     /**
+     * 内置工具加载
+     */
+    private function toolAction()
+    {
+        $tool = strtolower($_GET['TOOL_REQUEST']);
+        $tool_class_name = '\Uis\Tool\\' . UisStr::camelName($tool) . 'Tool';
+        if (!class_exists($tool_class_name)) {
+            $this->response->setStatus(500, 'tool not found');
+            return;
+        }
+        $tool_obj = new $tool_class_name($this);
+        if ($tool_obj instanceof Tool) {
+            $tool_obj->action();
+        } else {
+            $this->response->setStatus(500, $tool_class_name . ' is not instance of Tool');
+        }
+    }
+
+    /**
      * 获取实例
      * @return Application
      */
     public static function getInstance()
     {
         return self::$instance;
-    }
-
-    /**
-     * 内置工具加载
-     */
-    private function toolAction()
-    {
-        $tool = strtolower($_GET['TOOL_REQUEST']);
-        if ('mock' === $tool) {
-            $this->mockAction();
-        } else {
-            $tool_class_name = UisStr::camelName($tool) . 'Tool';
-            $file = UisEnv::getRootPath() . 'tool/class/' . $tool_class_name . '.php';
-            if (is_file($file)) {
-                $full_class = '\\Uis\Tool\\' . $tool_class_name;
-                /** @noinspection PhpIncludeInspection */
-                require_once $file;
-                $tool_obj = new $full_class($this);
-                if ($tool_obj instanceof Tool) {
-                    $tool_obj->action();
-                }
-            } else {
-                $this->response->setStatus(500, 'tool not found');
-            }
-        }
     }
 }
