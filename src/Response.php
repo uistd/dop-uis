@@ -81,7 +81,7 @@ class Response
             $page_name = Str::camelName($server_info->getPageName());
             $action_name = Str::camelName($server_info->getActionName());
             $class_name = $action_name . 'Response';
-            $response_class = '\\Protocol\\' . $app_name . '\\' . $page_name . '\\' . $class_name;
+            $response_class = '\Uis\Protocol\\' . $app_name . '\\' . $page_name . '\\' . $class_name;
             if (!class_exists($response_class)) {
                 throw new ActionException('No response protocol', self::STATUS_PROTOCOL_NOT_FOUND);
             }

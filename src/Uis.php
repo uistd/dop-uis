@@ -90,6 +90,6 @@ class Uis
     public static function debug($var)
     {
         $log_str = Debug::varFormat($var);
-        self::getLogger()->debug('[DEBUG]' . $log_str);
+        self::getLogger()->debug($log_str);
     }
 }

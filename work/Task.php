@@ -4,6 +4,7 @@ namespace UiStd\Uis\Work;
 
 use UiStd\Common\Config;
 use UiStd\Common\Str;
+use UiStd\Common\Utils;
 use UiStd\Logger\LogHelper;
 
 class Task
@@ -123,7 +124,7 @@ class Task
             return;
         }
         $cmd = 'kill -' . $signal . ' ' . $process_id;
-        $this->log('execute '. $cmd);
+        $this->log('execute ' . $cmd);
         exec($cmd);
     }
 
@@ -133,7 +134,8 @@ class Task
      */
     private function getCmd()
     {
-        $cmd = $this->php_bin . ' task.php ' . $this->app_name . ' ' . $this->class_name . '.php';
+        $file = Utils::fixWithRootPath('work') .'task.php';
+        $cmd = $this->php_bin . ' ' . $file . ' ' . $this->app_name . ' ' . $this->class_name . '.php';
         if (!empty($this->args)) {
             $cmd .= ' ' . $this->args;
         }

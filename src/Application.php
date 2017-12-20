@@ -27,6 +27,11 @@ class Application
     private $app_name;
 
     /**
+     * @var string app name 的驼峰命名
+     */
+    private $camel_app_name;
+
+    /**
      * @var Response 输出类
      */
     private $response;
@@ -47,11 +52,6 @@ class Application
     private $filter_list;
 
     /**
-     * @var string 应用的主命名空间
-     */
-    private $app_ns;
-
-    /**
      * @var View 视图对象
      */
     private $view;
@@ -69,10 +69,9 @@ class Application
         Uis::getLogger();
         $this->init();
         $this->server_info = ServerHandler::getInstance();
-        spl_autoload_register([$this, 'autoLoader']);
         self::$instance = $this;
         $this->app_name = $this->server_info->getAppName();
-        define('APP_PATH', ROOT_PATH . 'apps/' . $this->app_name . '/');
+        $this->camel_app_name = UisStr::camelName($this->app_name);
         $this->response = new Response();
         $this->view = new View($this->response);
         Debug::init();
@@ -85,7 +84,8 @@ class Application
     {
         $event_mrg = EventManager::instance();
         try {
-            $init_file = APP_PATH . 'init.php';
+            //加载 初始化文件
+            $init_file = ROOT_PATH . 'apps/init.php';
             if (is_file($init_file)) {
                 /** @noinspection PhpIncludeInspection */
                 require_once $init_file;
@@ -139,7 +139,7 @@ class Application
         $action_name = $this->server_info->getActionName();
         $u_page_name = UisStr::camelName($page_name);
         $class_name = $u_page_name . 'Page';
-        $ns = $this->getAppNameSpace() . '\\Page\\';
+        $ns = 'Uis\Page\\' . $this->camel_app_name .'\\';
         $class_name = $ns . $class_name;
         if (!class_exists($class_name)) {
             $this->response->setStatus(Response::STATUS_PAGE_NOT_FOUND);
@@ -184,8 +184,8 @@ class Application
         if (Response::STATUS_OK !== $this->response->getStatus()) {
             return;
         }
-        $u_app_name = UisStr::camelName($this->app_name);
-        $mock_class = '\\Protocol\\PluginMock\\' . $u_app_name . '\\Mock' . $u_app_name . $u_page_name;
+        $ns = '\Uis\Protocol\PluginMock\\' . $this->camel_app_name;
+        $mock_class = $ns . '\Mock' . $this->camel_app_name . $u_page_name;
         if (!class_exists($mock_class)) {
             $this->response->setStatus(Response::STATUS_PAGE_NOT_FOUND, 'Mock class ' . $mock_class . ' not found');
             return;
@@ -203,9 +203,7 @@ class Application
         $this->response->setResult($data);
 
         //如果 存在mock方法，将mock出来的对象 调用 mock 方法 二次加工
-        $class_name = $u_page_name . 'Mock';
-        $ns = $this->getAppNameSpace() . '\\Mock\\';
-        $class_name = $ns . $class_name;
+        $class_name = 'Uis\Protocol\PluginMock\\' . $u_page_name . 'Mock';
         if (class_exists($class_name)) {
             $mock_obj = new $class_name();
             $call_func = 'mock' . $action_name;
@@ -224,7 +222,7 @@ class Application
     private function getActionArgs($page_name, $action_name)
     {
         $class_name = $action_name . 'Request';
-        $dop_class = '\\Protocol\\' . UisStr::camelName($this->app_name) . '\\' . $page_name . '\\' . $class_name;
+        $dop_class = '\Uis\Protocol\\' . $this->camel_app_name . '\\' . $page_name . '\\' . $class_name;
         $action_args = null;
         if (!class_exists($dop_class)) {
             return null;
@@ -261,19 +259,6 @@ class Application
     }
 
     /**
-     * 获取应用的主命名空间
-     * @return string
-     */
-    private function getAppNameSpace()
-    {
-        if (null === $this->app_ns) {
-            $u_app_name = UisStr::camelName($this->app_name);
-            $this->app_ns = 'Uis\\' . $u_app_name;
-        }
-        return $this->app_ns;
-    }
-
-    /**
      * 获取pathInfo
      * @return ServerHandler
      */
@@ -301,6 +286,15 @@ class Application
     }
 
     /**
+     * 获取appName(驼峰命名)
+     * @return string
+     */
+    public function getAppCamelName()
+    {
+        return $this->camel_app_name;
+    }
+
+    /**
      * 获取视图对象
      * @return View
      */
@@ -325,27 +319,6 @@ class Application
     public static function getInstance()
     {
         return self::$instance;
-    }
-
-    /**
-     * 一些内置的自动加载
-     * @param string $class_name
-     */
-    public function autoLoader($class_name)
-    {
-        //以Uis\App开始的
-        $main_ns = $this->getAppNameSpace();
-        if (0 !== strpos($class_name, $main_ns)) {
-            return;
-        }
-        $sub_name = substr($class_name, strlen($main_ns) + 1);
-        $path_name = str_replace('\\', '/', $sub_name);
-        $file = UisEnv::getRootPath() . 'apps/' . $this->app_name . '/' . $path_name . '.php';
-        if (!is_file($file)) {
-            return;
-        }
-        /** @noinspection PhpIncludeInspection */
-        require_once $file;
     }
 
     /**

@@ -156,8 +156,8 @@ class ActivityManager
      */
     private function initActiveInstance($name)
     {
-        $app_name = Str::camelName(Application::getInstance()->getAppName());
-        $class_name = '\\Uis\\' . $app_name . '\\Activity\\' . $name . 'Activity';
+        $app_name = Application::getInstance()->getAppCamelName();
+        $class_name = '\Uis\Activity\\' . $app_name . '\\'.$name.'Activity';
         if (!class_exists($class_name)) {
             throw new InvalidConfigException('uis-activity:' . $name . ' class not found');
         }
